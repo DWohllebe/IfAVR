@@ -242,6 +242,8 @@ public class MainActivity extends CardboardActivity implements CardboardView.Ste
         floorVertices.put(WorldLayoutData.FLOOR_COORDS);
         floorVertices.position(0);
 
+        //glObj.floorVertices = prepareFloatBuffer(glObj)
+
         ByteBuffer bbFloorNormals = ByteBuffer.allocateDirect(WorldLayoutData.FLOOR_NORMALS.length * 4);
         bbFloorNormals.order(ByteOrder.nativeOrder());
         floorNormals = bbFloorNormals.asFloatBuffer();
@@ -316,30 +318,7 @@ public class MainActivity extends CardboardActivity implements CardboardView.Ste
         checkGLError("onSurfaceCreated");
     }
 
-    private void prepareGlDrawable(glDrawable _d, FloatBuffer _vertices, FloatBuffer _colors, FloatBuffer _normals) {
-        ByteBuffer bbVertices = ByteBuffer.allocateDirect(_d.COORDS.length * 4);
-        bbVertices.order(ByteOrder.nativeOrder());
-        _vertices.put((_d.COORDS));
-        _vertices.position(0);
 
-        ByteBuffer bbColors = ByteBuffer.allocateDirect(_d.COLORS.length * 4);
-        bbColors.order(ByteOrder.nativeOrder());
-        _colors = bbColors.asFloatBuffer();
-        _colors.put(_d.COLORS);
-        _colors.position(0);
-
-//        ByteBuffer bbFoundColors = ByteBuffer.allocateDirect(_d.ACTIVE_COLORS.length * 4);
-//        bbFoundColors.order(ByteOrder.nativeOrder());
-//        cubeFoundColors = bbFoundColors.asFloatBuffer();
-//        cubeFoundColors.put(_d.ACTIVE_COLORS);
-//        cubeFoundColors.position(0);
-
-        ByteBuffer bbNormals = ByteBuffer.allocateDirect(_d.NORMALS.length * 4);
-        bbNormals.order(ByteOrder.nativeOrder());
-        _normals = bbNormals.asFloatBuffer();
-        _normals.put(_d.NORMALS);
-        _normals.position(0);
-    }
 
     private int createProgram(int[] _shader) {
         int _program = GLES20.glCreateProgram();
@@ -485,6 +464,26 @@ public class MainActivity extends CardboardActivity implements CardboardView.Ste
         GLES20.glDrawArrays(GLES20.GL_TRIANGLES, 0, 6);
 
         checkGLError("drawing floor");
+    }
+
+    public void drawGlObject(glDrawable _obj) {
+        GLES20.glUseProgram(_obj.program);
+
+        // Set ModelView, MVP, position, normals, and color.
+        GLES20.glUniform3fv(_obj.lightPosParam, 1, _obj.lightPosInEyeSpace, 0);
+        GLES20.glUniformMatrix4fv(_obj.modelParam, 1, false, _obj.model, 0);
+        GLES20.glUniformMatrix4fv(_obj.modelViewParam, 1, false, modelView, 0);
+        GLES20.glUniformMatrix4fv(_obj.modelViewProjectionParam, 1, false,
+                modelViewProjection, 0);
+        GLES20.glVertexAttribPointer(_obj.positionParam, COORDS_PER_VERTEX, GLES20.GL_FLOAT,
+                false, 0, floorVertices);
+        GLES20.glVertexAttribPointer(_obj.normalParam, 3, GLES20.GL_FLOAT, false, 0,
+                floorNormals);
+        GLES20.glVertexAttribPointer(_obj.colorParam, 4, GLES20.GL_FLOAT, false, 0, floorColors);
+
+        GLES20.glDrawArrays(GLES20.GL_TRIANGLES, 0, 6);
+
+        checkGLError("drawing object " + _obj.name);
     }
 
     /**
