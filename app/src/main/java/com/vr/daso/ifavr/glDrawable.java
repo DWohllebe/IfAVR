@@ -13,13 +13,13 @@ public class glDrawable {
     public float[] ACTIVE_COLORS;
     public float[] NORMALS;
 
-    private int cubePositionParam;
-    private int cubeNormalParam;
-    private int cubeColorParam;
-    private int cubeModelParam;
-    private int cubeModelViewParam;
-    private int cubeModelViewProjectionParam;
-    private int cubeLightPosParam;
+    private int PositionParam;
+    private int NormalParam;
+    private int ColorParam;
+    private int ModelParam;
+    private int ModelViewParam;
+    private int ModelViewProjectionParam;
+    private int LightPosParam;
 
     public float[] pose;
 

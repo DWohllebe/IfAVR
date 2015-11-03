@@ -210,29 +210,30 @@ public class MainActivity extends CardboardActivity implements CardboardView.Ste
         Log.i(TAG, "onSurfaceCreated");
         GLES20.glClearColor(0.1f, 0.1f, 0.1f, 0.5f); // Dark background so text shows up well.
 
-        ByteBuffer bbVertices = ByteBuffer.allocateDirect(WorldLayoutData.CUBE_COORDS.length * 4);
-        bbVertices.order(ByteOrder.nativeOrder());
-        cubeVertices.put(WorldLayoutData.CUBE_COORDS);
-        cubeVertices.position(0);
+//        ByteBuffer bbVertices = ByteBuffer.allocateDirect(WorldLayoutData.CUBE_COORDS.length * 4);
+//        bbVertices.order(ByteOrder.nativeOrder());
+//        cubeColors = bbVertices.asFloatBuffer();
+//        cubeVertices.put(WorldLayoutData.CUBE_COORDS);
+//        cubeVertices.position(0);
 
-        ByteBuffer bbColors = ByteBuffer.allocateDirect(WorldLayoutData.CUBE_COLORS.length * 4);
-        bbColors.order(ByteOrder.nativeOrder());
-        cubeColors = bbColors.asFloatBuffer();
-        cubeColors.put(WorldLayoutData.CUBE_COLORS);
-        cubeColors.position(0);
+//        ByteBuffer bbColors = ByteBuffer.allocateDirect(WorldLayoutData.CUBE_COLORS.length * 4);
+//        bbColors.order(ByteOrder.nativeOrder());
+//        cubeColors = bbColors.asFloatBuffer();
+//        cubeColors.put(WorldLayoutData.CUBE_COLORS);
+//        cubeColors.position(0);
 
-        ByteBuffer bbFoundColors = ByteBuffer.allocateDirect(
-                WorldLayoutData.CUBE_FOUND_COLORS.length * 4);
-        bbFoundColors.order(ByteOrder.nativeOrder());
-        cubeFoundColors = bbFoundColors.asFloatBuffer();
-        cubeFoundColors.put(WorldLayoutData.CUBE_FOUND_COLORS);
-        cubeFoundColors.position(0);
+//        ByteBuffer bbFoundColors = ByteBuffer.allocateDirect(
+//                WorldLayoutData.CUBE_FOUND_COLORS.length * 4);
+//        bbFoundColors.order(ByteOrder.nativeOrder());
+//        cubeFoundColors = bbFoundColors.asFloatBuffer();
+//        cubeFoundColors.put(WorldLayoutData.CUBE_FOUND_COLORS);
+//        cubeFoundColors.position(0);
 
-        ByteBuffer bbNormals = ByteBuffer.allocateDirect(WorldLayoutData.CUBE_NORMALS.length * 4);
-        bbNormals.order(ByteOrder.nativeOrder());
-        cubeNormals = bbNormals.asFloatBuffer();
-        cubeNormals.put(WorldLayoutData.CUBE_NORMALS);
-        cubeNormals.position(0);
+//        ByteBuffer bbNormals = ByteBuffer.allocateDirect(WorldLayoutData.CUBE_NORMALS.length * 4);
+//        bbNormals.order(ByteOrder.nativeOrder());
+//        cubeNormals = bbNormals.asFloatBuffer();
+//        cubeNormals.put(WorldLayoutData.CUBE_NORMALS);
+//        cubeNormals.position(0);
 
         // make a floor
         ByteBuffer bbFloorVertices = ByteBuffer.allocateDirect(WorldLayoutData.FLOOR_COORDS.length * 4);
@@ -257,34 +258,36 @@ public class MainActivity extends CardboardActivity implements CardboardView.Ste
         int gridShader = loadGLShader(GLES20.GL_FRAGMENT_SHADER, R.raw.grid_fragment);
         int passthroughShader = loadGLShader(GLES20.GL_FRAGMENT_SHADER, R.raw.passthrough_fragment);
 
-        cubeProgram = GLES20.glCreateProgram();
-        GLES20.glAttachShader(cubeProgram, vertexShader);
-        GLES20.glAttachShader(cubeProgram, passthroughShader);
-        GLES20.glLinkProgram(cubeProgram);
-        GLES20.glUseProgram(cubeProgram);
+//        cubeProgram = GLES20.glCreateProgram();
+//        GLES20.glAttachShader(cubeProgram, vertexShader);
+//        GLES20.glAttachShader(cubeProgram, passthroughShader);
+//        GLES20.glLinkProgram(cubeProgram);
+//        GLES20.glUseProgram(cubeProgram);
 
         checkGLError("Cube program");
 
-        cubePositionParam = GLES20.glGetAttribLocation(cubeProgram, "a_Position");
-        cubeNormalParam = GLES20.glGetAttribLocation(cubeProgram, "a_Normal");
-        cubeColorParam = GLES20.glGetAttribLocation(cubeProgram, "a_Color");
+//        cubePositionParam = GLES20.glGetAttribLocation(cubeProgram, "a_Position");
+//        cubeNormalParam = GLES20.glGetAttribLocation(cubeProgram, "a_Normal");
+//        cubeColorParam = GLES20.glGetAttribLocation(cubeProgram, "a_Color");
 
-        cubeModelParam = GLES20.glGetUniformLocation(cubeProgram, "u_Model");
-        cubeModelViewParam = GLES20.glGetUniformLocation(cubeProgram, "u_MVMatrix");
-        cubeModelViewProjectionParam = GLES20.glGetUniformLocation(cubeProgram, "u_MVP");
-        cubeLightPosParam = GLES20.glGetUniformLocation(cubeProgram, "u_LightPos");
+//        cubeModelParam = GLES20.glGetUniformLocation(cubeProgram, "u_Model");
+//        cubeModelViewParam = GLES20.glGetUniformLocation(cubeProgram, "u_MVMatrix");
+//        cubeModelViewProjectionParam = GLES20.glGetUniformLocation(cubeProgram, "u_MVP");
+//        cubeLightPosParam = GLES20.glGetUniformLocation(cubeProgram, "u_LightPos");
 
-        GLES20.glEnableVertexAttribArray(cubePositionParam);
-        GLES20.glEnableVertexAttribArray(cubeNormalParam);
-        GLES20.glEnableVertexAttribArray(cubeColorParam);
+//        GLES20.glEnableVertexAttribArray(cubePositionParam);
+//        GLES20.glEnableVertexAttribArray(cubeNormalParam);
+//        GLES20.glEnableVertexAttribArray(cubeColorParam);
 
-        checkGLError("Cube program params");
+//        checkGLError("Cube program params");
 
-        floorProgram = GLES20.glCreateProgram();
-        GLES20.glAttachShader(floorProgram, vertexShader);
-        GLES20.glAttachShader(floorProgram, gridShader);
-        GLES20.glLinkProgram(floorProgram);
-        GLES20.glUseProgram(floorProgram);
+//        floorProgram = GLES20.glCreateProgram();
+//        GLES20.glAttachShader(floorProgram, vertexShader);
+//        GLES20.glAttachShader(floorProgram, gridShader);
+//        GLES20.glLinkProgram(floorProgram);
+//        GLES20.glUseProgram(floorProgram);
+        int[] floorshaders = {vertexShader, gridShader};
+        floorProgram = createProgram(floorshaders);
 
         checkGLError("Floor program");
 
@@ -304,8 +307,8 @@ public class MainActivity extends CardboardActivity implements CardboardView.Ste
         checkGLError("Floor program params");
 
         // Object first appears directly in front of user.
-        Matrix.setIdentityM(modelCube, 0);
-        Matrix.translateM(modelCube, 0, 0, 0, -objectDistance);
+//        Matrix.setIdentityM(modelCube, 0);
+//        Matrix.translateM(modelCube, 0, 0, 0, -objectDistance);
 
         Matrix.setIdentityM(modelFloor, 0);
         Matrix.translateM(modelFloor, 0, 0, -floorDepth, 0); // Floor appears below user.
@@ -313,7 +316,7 @@ public class MainActivity extends CardboardActivity implements CardboardView.Ste
         checkGLError("onSurfaceCreated");
     }
 
-    void prepareGlDrawable(glDrawable _d, FloatBuffer _vertices, FloatBuffer _colors, FloatBuffer _normals) {
+    private void prepareGlDrawable(glDrawable _d, FloatBuffer _vertices, FloatBuffer _colors, FloatBuffer _normals) {
         ByteBuffer bbVertices = ByteBuffer.allocateDirect(_d.COORDS.length * 4);
         bbVertices.order(ByteOrder.nativeOrder());
         _vertices.put((_d.COORDS));
@@ -336,6 +339,16 @@ public class MainActivity extends CardboardActivity implements CardboardView.Ste
         _normals = bbNormals.asFloatBuffer();
         _normals.put(_d.NORMALS);
         _normals.position(0);
+    }
+
+    private int createProgram(int[] _shader) {
+        int _program = GLES20.glCreateProgram();
+        for (int shader : _shader) {
+            GLES20.glAttachShader(_program, shader);
+        }
+        GLES20.glLinkProgram(_program);
+        GLES20.glUseProgram(_program);
+        return _program;
     }
 
     /**
@@ -369,7 +382,7 @@ public class MainActivity extends CardboardActivity implements CardboardView.Ste
     @Override
     public void onNewFrame(HeadTransform headTransform) {
         // Build the Model part of the ModelView matrix.
-        Matrix.rotateM(modelCube, 0, TIME_DELTA, 0.5f, 0.5f, 1.0f);
+//        Matrix.rotateM(modelCube, 0, TIME_DELTA, 0.5f, 0.5f, 1.0f);
 
         // Build the camera matrix and apply it to the ModelView.
         Matrix.setLookAtM(camera, 0, 0.0f, 0.0f, CAMERA_Z, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f);
@@ -400,9 +413,9 @@ public class MainActivity extends CardboardActivity implements CardboardView.Ste
         // Build the ModelView and ModelViewProjection matrices
         // for calculating cube position and light.
         float[] perspective = eye.getPerspective(Z_NEAR, Z_FAR);
-        Matrix.multiplyMM(modelView, 0, view, 0, modelCube, 0);
+//        Matrix.multiplyMM(modelView, 0, view, 0, modelCube, 0);
         Matrix.multiplyMM(modelViewProjection, 0, perspective, 0, modelView, 0);
-        drawCube();
+//        drawCube();
 
         // Set modelView for the floor, so we draw floor in the correct location
         Matrix.multiplyMM(modelView, 0, view, 0, modelFloor, 0);
