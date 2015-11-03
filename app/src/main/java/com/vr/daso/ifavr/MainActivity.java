@@ -212,7 +212,6 @@ public class MainActivity extends CardboardActivity implements CardboardView.Ste
 
         ByteBuffer bbVertices = ByteBuffer.allocateDirect(WorldLayoutData.CUBE_COORDS.length * 4);
         bbVertices.order(ByteOrder.nativeOrder());
-        cubeVertices = bbVertices.asFloatBuffer();
         cubeVertices.put(WorldLayoutData.CUBE_COORDS);
         cubeVertices.position(0);
 
@@ -312,6 +311,31 @@ public class MainActivity extends CardboardActivity implements CardboardView.Ste
         Matrix.translateM(modelFloor, 0, 0, -floorDepth, 0); // Floor appears below user.
 
         checkGLError("onSurfaceCreated");
+    }
+
+    void prepareGlDrawable(glDrawable _d, FloatBuffer _vertices, FloatBuffer _colors, FloatBuffer _normals) {
+        ByteBuffer bbVertices = ByteBuffer.allocateDirect(_d.COORDS.length * 4);
+        bbVertices.order(ByteOrder.nativeOrder());
+        _vertices.put((_d.COORDS));
+        _vertices.position(0);
+
+        ByteBuffer bbColors = ByteBuffer.allocateDirect(_d.COLORS.length * 4);
+        bbColors.order(ByteOrder.nativeOrder());
+        _colors = bbColors.asFloatBuffer();
+        _colors.put(_d.COLORS);
+        _colors.position(0);
+
+//        ByteBuffer bbFoundColors = ByteBuffer.allocateDirect(_d.ACTIVE_COLORS.length * 4);
+//        bbFoundColors.order(ByteOrder.nativeOrder());
+//        cubeFoundColors = bbFoundColors.asFloatBuffer();
+//        cubeFoundColors.put(_d.ACTIVE_COLORS);
+//        cubeFoundColors.position(0);
+
+        ByteBuffer bbNormals = ByteBuffer.allocateDirect(_d.NORMALS.length * 4);
+        bbNormals.order(ByteOrder.nativeOrder());
+        _normals = bbNormals.asFloatBuffer();
+        _normals.put(_d.NORMALS);
+        _normals.position(0);
     }
 
     /**
