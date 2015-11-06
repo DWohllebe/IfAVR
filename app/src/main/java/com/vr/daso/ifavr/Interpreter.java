@@ -27,7 +27,7 @@ public class Interpreter {
         public String nameJAV;
     }
 
-    Model load(String _file) {
+    glDrawable load(String _file, int[] _shader, int _mOffset, float _initial_x, float _initial_y, float _intital_z) {
         Log.i(TAG, "load");
         ArrayList<Model> result = new ArrayList<Model>();
         Model model = new Model();
@@ -100,7 +100,7 @@ public class Interpreter {
             Log.e(TAG, e + ": Could not process file " + _file);
         }
         finally {
-            return model;
+            return makeDrawable(model, _shader, _mOffset, _initial_x, _initial_y, _intital_z);
         }
     }
 
@@ -111,6 +111,10 @@ public class Interpreter {
             result.add(st.nextToken());
         }
         return result;
+    }
+
+    glDrawable makeDrawable(Model _base, int[] _shader, int _mOffset, float _initial_x, float _initial_y, float _intital_z) {
+        return new glDrawable(_base, _shader, _mOffset, _initial_x, _initial_y, _intital_z);
     }
 }
 

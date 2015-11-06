@@ -29,6 +29,7 @@ import java.io.InputStreamReader;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.FloatBuffer;
+import java.util.ArrayList;
 
 import javax.microedition.khronos.egl.EGLConfig;
 
@@ -100,6 +101,12 @@ public class MainActivity extends CardboardActivity implements CardboardView.Ste
     private int floorModelViewParam;
     private int floorModelViewProjectionParam;
     private int floorLightPosParam;
+
+    //revised parameter scheme
+    // idea: instead of predefined objects, we need the ability to dynamically load everything into the
+    // scene. In the end, what we want is a Dynamic List of Drawable Objects
+    private ArrayList<glDrawable> drawableObjects = new ArrayList<glDrawable>();
+    private Interpreter interpreter = new Interpreter();  // TODO: templatize for different file formats
 
     private float[] modelCube;
     private float[] camera;
@@ -260,6 +267,16 @@ public class MainActivity extends CardboardActivity implements CardboardView.Ste
         int gridShader = loadGLShader(GLES20.GL_FRAGMENT_SHADER, R.raw.grid_fragment);
         int passthroughShader = loadGLShader(GLES20.GL_FRAGMENT_SHADER, R.raw.passthrough_fragment);
 
+        // *** First implementation trying to implement a Barkley teapot ***
+        // Step 1: Create a drawable object from the OBJ-File
+        int[] potshaders = {vertexShader, passthroughShader};
+//      glDrawable glTeapot = interpreter.load("res/gldrawable/teapot.obj", potshaders, 0, 0, 0, -objectDistance);
+        drawableObjects.add( interpreter.load(
+                getResources().openRawResource(R.raw.teapot),  // OBJ-Datei
+                potshaders, // Shader
+                0, 0, 0, -objectDistance) // Initiale Position
+        );
+
 //        cubeProgram = GLES20.glCreateProgram();
 //        GLES20.glAttachShader(cubeProgram, vertexShader);
 //        GLES20.glAttachShader(cubeProgram, passthroughShader);
@@ -317,8 +334,6 @@ public class MainActivity extends CardboardActivity implements CardboardView.Ste
 
         checkGLError("onSurfaceCreated");
     }
-
-
 
     private int createProgram(int[] _shader) {
         int _program = GLES20.glCreateProgram();
@@ -465,7 +480,7 @@ public class MainActivity extends CardboardActivity implements CardboardView.Ste
 
         checkGLError("drawing floor");
     }
-
+/*
     public void drawGlObject(glDrawable _obj) {
         GLES20.glUseProgram(_obj.program);
 
@@ -485,7 +500,7 @@ public class MainActivity extends CardboardActivity implements CardboardView.Ste
 
         checkGLError("drawing object " + _obj.name);
     }
-
+*/
     /**
      * Called when the Cardboard trigger is pulled.
      */
