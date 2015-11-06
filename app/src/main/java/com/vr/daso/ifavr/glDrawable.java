@@ -91,6 +91,8 @@ public class glDrawable {
         fbNormals.put(NORMALS);
         fbNormals.position(0);
 
+        checkGLError(TAG + ": Setting Byte Buffers");
+
 
 //        ByteBuffer bbFoundColors = ByteBuffer.allocateDirect(_d.ACTIVE_COLORS.length * 4);
 //        bbFoundColors.order(ByteOrder.nativeOrder());
@@ -119,6 +121,7 @@ public class glDrawable {
         }
         GLES20.glLinkProgram(program);
         GLES20.glUseProgram(program);
+        checkGLError(TAG + ": Create Program");
     }
 
     private void createParameters() {
@@ -134,6 +137,8 @@ public class glDrawable {
         GLES20.glEnableVertexAttribArray(positionParam);
         GLES20.glEnableVertexAttribArray(normalParam);
         GLES20.glEnableVertexAttribArray(colorParam);
+
+        checkGLError(TAG + ": Create Parameters");
     }
 
     private void translate(int _mOffset, float _x, float _y, float _z){
@@ -156,5 +161,20 @@ public class glDrawable {
         GLES20.glVertexAttribPointer(colorParam, 4, GLES20.GL_FLOAT, false, 0, fbColors);
 
         GLES20.glDrawArrays(GLES20.GL_TRIANGLES, 0, 6);
+
+        checkGLError(TAG + ": Draw");
+    }
+
+    /**
+     * Checks if we've had an error inside of OpenGL ES, and if so what that error is.
+     *
+     * @param label Label to report in case of error.
+     */
+    private void checkGLError(String label) {
+        int error;
+        while ((error = GLES20.glGetError()) != GLES20.GL_NO_ERROR) {
+            Log.e(TAG, label + ": glError " + error);
+            throw new RuntimeException(label + ": glError " + error);
+        }
     }
 }

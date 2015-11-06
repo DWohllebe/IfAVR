@@ -30,6 +30,7 @@ import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.FloatBuffer;
 import java.util.ArrayList;
+import java.util.Iterator;
 
 import javax.microedition.khronos.egl.EGLConfig;
 
@@ -416,6 +417,11 @@ public class MainActivity extends CardboardActivity implements CardboardView.Ste
         Matrix.multiplyMM(modelViewProjection, 0, perspective, 0,
                 modelView, 0);
         drawFloor();
+
+        Iterator<glDrawable> it = drawableObjects.iterator();
+        while (it.hasNext()) {
+            it.next().draw(modelView, modelViewProjection);
+        }
     }
 
     @Override
