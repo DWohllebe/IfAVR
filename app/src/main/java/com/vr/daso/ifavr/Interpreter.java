@@ -27,13 +27,13 @@ public class Interpreter {
         public String nameJAV;
     }
 
-    glDrawable load(String _file, int[] _shader, int _mOffset, float _initial_x, float _initial_y, float _intital_z) {
+    glDrawable load(InputStream _file, int[] _shader, int _mOffset, float _initial_x, float _initial_y, float _intital_z) {
         Log.i(TAG, "load");
         ArrayList<Model> result = new ArrayList<Model>();
         Model model = new Model();
         boolean decided = false;
         try {
-            BufferedReader in = new BufferedReader(new FileReader(_file));
+            BufferedReader in = new BufferedReader(new InputStreamReader(_file));
             if (in.ready()) {
                 String line;
                 try {
@@ -117,4 +117,3 @@ public class Interpreter {
         return new glDrawable(_base, _shader, _mOffset, _initial_x, _initial_y, _intital_z);
     }
 }
-

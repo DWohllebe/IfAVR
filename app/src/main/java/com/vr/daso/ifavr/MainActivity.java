@@ -269,11 +269,11 @@ public class MainActivity extends CardboardActivity implements CardboardView.Ste
 
         // *** First implementation trying to implement a Barkley teapot ***
         // Step 1: Create a drawable object from the OBJ-File
-        int[] potshaders = {vertexShader, passthroughShader};
+        int[] teapotshaders = {vertexShader, passthroughShader};
 //      glDrawable glTeapot = interpreter.load("res/gldrawable/teapot.obj", potshaders, 0, 0, 0, -objectDistance);
         drawableObjects.add( interpreter.load(
                 getResources().openRawResource(R.raw.teapot),  // OBJ-Datei
-                potshaders, // Shader
+                teapotshaders, // Shader
                 0, 0, 0, -objectDistance) // Initiale Position
         );
 
@@ -283,7 +283,7 @@ public class MainActivity extends CardboardActivity implements CardboardView.Ste
 //        GLES20.glLinkProgram(cubeProgram);
 //        GLES20.glUseProgram(cubeProgram);
 
-        checkGLError("Cube program");
+        checkGLError("Teapot program");
 
 //        cubePositionParam = GLES20.glGetAttribLocation(cubeProgram, "a_Position");
 //        cubeNormalParam = GLES20.glGetAttribLocation(cubeProgram, "a_Normal");

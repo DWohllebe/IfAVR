@@ -12,12 +12,18 @@ import java.nio.FloatBuffer;
  * Created by Daniel on 03.11.2015.
  */
 public class glDrawable {
-    public final String TAG = "glDrawableObject";
+    private final String TAG = "glDrawableObject";
 
-    public float[] COORDS;
-    public float[] COLORS;
-    public float[] ACTIVE_COLORS;
-    public float[] NORMALS;
+    private static final int COORDS_PER_VERTEX = 3;
+
+    private float[] COORDS;
+    private float[] COLORS;
+    private float[] ACTIVE_COLORS;
+    private float[] NORMALS;
+
+    private float[] normals;
+    private float[] vertices;
+    private float[] colors;
 
     private int program;
     private int positionParam;
@@ -30,11 +36,11 @@ public class glDrawable {
     private float[] model;
     private float[] lightPosInEyeSpace;
 
-    public FloatBuffer fbVertices;
-    public FloatBuffer fbColors;
-    public FloatBuffer fbNormals;
+    private FloatBuffer fbVertices;
+    private FloatBuffer fbColors;
+    private FloatBuffer fbNormals;
 
-    public final String name = "Drawable";
+    private final String name = "Drawable";
 
     private boolean isInteractable = false; //this should be relegated to an interface
     private boolean isPresent = true; // denotes wehter this object exists in the scene
@@ -134,20 +140,20 @@ public class glDrawable {
         Matrix.translateM(model, _mOffset, _x, _y, _z);
     }
 
-    public void draw() {
+    public void draw(float[] _modelView, float[] _modelViewProjection) {
         GLES20.glUseProgram(program);
 
         // Set ModelView, MVP, position, normals, and color.
         GLES20.glUniform3fv(lightPosParam, 1, lightPosInEyeSpace, 0);
         GLES20.glUniformMatrix4fv(modelParam, 1, false, model, 0);
-        GLES20.glUniformMatrix4fv(modelViewParam, 1, false, modelView, 0);
+        GLES20.glUniformMatrix4fv(modelViewParam, 1, false, _modelView, 0);
         GLES20.glUniformMatrix4fv(modelViewProjectionParam, 1, false,
-                modelViewProjection, 0);
+                _modelViewProjection, 0);
         GLES20.glVertexAttribPointer(positionParam, COORDS_PER_VERTEX, GLES20.GL_FLOAT,
-                false, 0, vertices);
+                false, 0, fbVertices);
         GLES20.glVertexAttribPointer(normalParam, 3, GLES20.GL_FLOAT, false, 0,
-                normals);
-        GLES20.glVertexAttribPointer(colorParam, 4, GLES20.GL_FLOAT, false, 0, colors);
+                fbNormals);
+        GLES20.glVertexAttribPointer(colorParam, 4, GLES20.GL_FLOAT, false, 0, fbColors);
 
         GLES20.glDrawArrays(GLES20.GL_TRIANGLES, 0, 6);
     }
