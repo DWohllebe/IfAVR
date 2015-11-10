@@ -33,8 +33,23 @@ public class Model {
 
     final String TAG = "ModelObject";
 
-    Object[] positions() {
-        return positions.toArray();
+    Model() {
+     mode = Model.MODE.UNDECIDED;
+    }
+
+    float[] positions() {
+//        Float[] returnval = new Float[positions.size()];
+        int offs = 0;
+        float[] part = new float[3];
+        float[] floaty = new float[positions.size()*3];
+        for (int i = 0; i < positions.size()-1; i++) {
+            part = positions.get(i);
+            for (int j = 0; j < 3; j++) {
+                floaty[offs + j] = part[j];
+            }
+            offs += 3;
+        }
+        return floaty;
     }
 
     void addPositions(float _x, float _y, float _z) {
@@ -63,15 +78,25 @@ public class Model {
         }
     }
 
-    Object[] normals() {
-        return normals.toArray();
+    float[] normals() {
+        int offs = 0;
+        float[] part = new float[3];
+        float[] normy = new float[normals.size()*3];
+        for (int i = 0; i < normals.size()-1; i++) {
+            part = normals.get(i);
+            for (int j = 0; j < 3; j++) {
+                normy[offs + j] = part[j];
+            }
+            offs += 3;
+        }
+        return normy;
     }
 
     void addNormals(float _x, float _y, float _z) {
         if (!finalized) {
             nnormals++;
             float[] nomar = {_x, _y, _z};
-            texels.add(nomar);
+            normals.add(nomar);
         }
         else {
             Log.e(TAG, "addNormals could not be called. Model is already finalized!");

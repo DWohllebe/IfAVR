@@ -33,7 +33,7 @@ public class glDrawable {
     private int modelViewParam;
     private int modelViewProjectionParam;
     private int lightPosParam;
-    private float[] model;
+    private float[] model = new float[16];
     private float[] lightPosInEyeSpace;
 
     private FloatBuffer fbVertices;
@@ -50,18 +50,23 @@ public class glDrawable {
 
 
     glDrawable(Model _model, int[] _shader, int _mOffset, float _initial_x, float _initial_y, float _intital_z) {
-        switch (_model.getMode() ) {
-            case MESH:
-                COORDS = (float[])_model.positions()[0];
-                NORMALS = (float[])_model.normals()[0];
-                break;
-
-            case ATOM:
-                break;
-
-            case UNDECIDED:
-                Log.e(TAG, "Model-type is undecided!");
+//        switch (_model.getMode() ) {
+//            case MESH:
+                COORDS = _model.positions();
+        try {
+            NORMALS =  _model.normals();
         }
+        catch(Exception e) {
+            Log.e(TAG, e.getMessage());
+        }
+ //               break;
+
+ //           case ATOM:
+ //               break;
+
+  //          case UNDECIDED:
+   //             Log.e(TAG, "Model-type is undecided!");
+ //       }
         prepareFloatBuffer();
         createProgram(_shader);
 //        checkGLError("Cube program");
@@ -71,19 +76,19 @@ public class glDrawable {
     }
 
     private void prepareFloatBuffer() {
-        FloatBuffer result;
-
         ByteBuffer bbVertices = ByteBuffer.allocateDirect(COORDS.length * 4);
         bbVertices.order(ByteOrder.nativeOrder());
         fbVertices = bbVertices.asFloatBuffer();
-        fbVertices.put((COORDS));
+        fbVertices.put(COORDS);
         fbVertices.position(0);
 
+        /*
         ByteBuffer bbColors = ByteBuffer.allocateDirect(COLORS.length * 4);
         bbColors.order(ByteOrder.nativeOrder());
         fbColors = bbColors.asFloatBuffer();
         fbColors.put(COLORS);
         fbColors.position(0);
+*/
 
         ByteBuffer bbNormals = ByteBuffer.allocateDirect(NORMALS.length * 4);
         bbNormals.order(ByteOrder.nativeOrder());
@@ -158,7 +163,7 @@ public class glDrawable {
                 false, 0, fbVertices);
         GLES20.glVertexAttribPointer(normalParam, 3, GLES20.GL_FLOAT, false, 0,
                 fbNormals);
-        GLES20.glVertexAttribPointer(colorParam, 4, GLES20.GL_FLOAT, false, 0, fbColors);
+//        GLES20.glVertexAttribPointer(colorParam, 4, GLES20.GL_FLOAT, false, 0, fbColors);
 
         GLES20.glDrawArrays(GLES20.GL_TRIANGLES, 0, 6);
 

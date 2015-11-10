@@ -61,8 +61,18 @@ public class Interpreter {
                             }
                             if (linetokens.get(0).contentEquals("f")) {
                                 int[] facevals = new int[9];
-                                for (int i= 0; i < 9; i++){
-                                    facevals[i] = Integer.parseInt(linetokens.get(i+1));
+
+                                for (int i = 0; i < 3; i++){
+                                    String[] strings = linetokens.get(i+1).split("/");
+                                    facevals[i*3] = Integer.parseInt(strings[0]);
+                                    try {
+                                        facevals[i * 3 + 1] = Integer.parseInt(strings[1]);
+                                    }
+                                    catch(NumberFormatException e) {
+//                                        Log.i(TAG, e.getMessage());
+                                        facevals[i * 3 + 1] = 0;
+                                    }
+                                    facevals[i*3+2] = Integer.parseInt(strings[2]);
                                 }
                                 model.addFaces(facevals);
                             }
