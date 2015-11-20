@@ -32,6 +32,7 @@ public class Interpreter {
         ArrayList<Model> result = new ArrayList<Model>();
         Model model = new Model();
         boolean decided = false;
+        String name = "Default name";
         try {
             BufferedReader in = new BufferedReader(new InputStreamReader(_file));
             if (in.ready()) {
@@ -47,6 +48,7 @@ public class Interpreter {
                                 float y = Float.parseFloat(linetokens.get(2));
                                 float z = Float.parseFloat(linetokens.get(3));
                                 model.addPositions(x, y, z);
+                                model.addColors(0.8359375f,  0.17578125f,  0.125f, 1.0f);
                             }
                             if (linetokens.get(0).contentEquals("vt")) {
                                 float uv1 = Float.parseFloat(linetokens.get(1));
@@ -93,6 +95,9 @@ public class Interpreter {
                                 decided = true;
                             }
                         }
+                        if (linetokens.get(0).contentEquals("o")) {
+                            name = linetokens.get(1);
+                        }
                     }
                 }
                 finally {
@@ -110,7 +115,7 @@ public class Interpreter {
             Log.e(TAG, e + ": Could not process file " + _file);
         }
         finally {
-            return makeDrawable(model, _shader, _mOffset, _initial_x, _initial_y, _intital_z);
+            return makeDrawable(model, _shader, _mOffset, _initial_x, _initial_y, _intital_z, name);
         }
     }
 
@@ -123,7 +128,7 @@ public class Interpreter {
         return result;
     }
 
-    glDrawable makeDrawable(Model _base, int[] _shader, int _mOffset, float _initial_x, float _initial_y, float _intital_z) {
-        return new glDrawable(_base, _shader, _mOffset, _initial_x, _initial_y, _intital_z);
+    glDrawable makeDrawable(Model _base, int[] _shader, int _mOffset, float _initial_x, float _initial_y, float _initial_z, String _name) {
+        return new glDrawable(_base, _shader, _mOffset, _initial_x, _initial_y, _initial_z, _name);
     }
 }

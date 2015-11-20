@@ -14,6 +14,7 @@ public class Model {
     private int nnormals = 0;
     private int nfaces = 0;
     private int npoints = 0;
+    private int ncolors = 0;
 
 //    private float positions[][];    // XYZ
 //    private float texels[][];          // UV
@@ -25,6 +26,7 @@ public class Model {
     private ArrayList<float[]> normals= new ArrayList<float[]>();
     private ArrayList<int[]> faces= new ArrayList<int[]>();
     private ArrayList<float[]> points= new ArrayList<float[]>();
+    private ArrayList<float[]> colors = new ArrayList<float[]>();
 
     public enum MODE {UNDECIDED, MESH, ATOM};
     private MODE mode;
@@ -42,7 +44,7 @@ public class Model {
         int offs = 0;
         float[] part = new float[3];
         float[] floaty = new float[positions.size()*3];
-        for (int i = 0; i < positions.size()-1; i++) {
+        for (int i = 0; i < positions.size()/3; i++) {
             part = positions.get(i);
             for (int j = 0; j < 3; j++) {
                 floaty[offs + j] = part[j];
@@ -61,6 +63,10 @@ public class Model {
         else {
             Log.e(TAG, "addPositions could not be called. Model is already finalized!");
         }
+    }
+
+    int positionsSize() {
+        return npositions;
     }
 
     Object[] texels() {
@@ -82,7 +88,7 @@ public class Model {
         int offs = 0;
         float[] part = new float[3];
         float[] normy = new float[normals.size()*3];
-        for (int i = 0; i < normals.size()-1; i++) {
+        for (int i = 0; i < normals.size()/3; i++) {
             part = normals.get(i);
             for (int j = 0; j < 3; j++) {
                 normy[offs + j] = part[j];
@@ -125,6 +131,31 @@ public class Model {
         }
         else {
             Log.e(TAG, "addPoints could not be called. Model is already finalized!");
+        }
+    }
+
+    float[] colors() {
+        int offs = 0;
+        float[] part = new float[4];
+        float[] coloy = new float[colors.size()*3];
+        for (int i = 0; i < colors.size()/4; i++) {
+            part = colors.get(i);
+            for (int j = 0; j < 4; j++) {
+                coloy[offs + j] = part[j];
+            }
+            offs += 4;
+        }
+        return coloy;
+    }
+
+    void addColors(float _red, float _green, float _blue, float _alpha) {
+        if (!finalized) {
+            ncolors++;
+            float[] colar = {_red, _green, _blue, _alpha};
+            colors.add(colar);
+        }
+        else {
+            Log.e(TAG, "addColors could not be called. Model is already finalized!");
         }
     }
 

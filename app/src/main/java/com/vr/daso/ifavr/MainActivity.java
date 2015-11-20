@@ -420,7 +420,7 @@ public class MainActivity extends CardboardActivity implements CardboardView.Ste
 
         Iterator<glDrawable> it = drawableObjects.iterator();
         while (it.hasNext()) {
-            it.next().draw(modelView, modelViewProjection);
+            it.next().draw(modelView, modelViewProjection, lightPosInEyeSpace);
         }
     }
 

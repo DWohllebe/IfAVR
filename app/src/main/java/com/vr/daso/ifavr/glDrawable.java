@@ -21,6 +21,8 @@ public class glDrawable {
     private float[] ACTIVE_COLORS;
     private float[] NORMALS;
 
+    private int COORDS_COUNT = 0;
+
     private float[] normals;
     private float[] vertices;
     private float[] colors;
@@ -40,7 +42,7 @@ public class glDrawable {
     private FloatBuffer fbColors;
     private FloatBuffer fbNormals;
 
-    private final String name = "Drawable";
+    private final String name;
 
     private boolean isInteractable = false; //this should be relegated to an interface
     private boolean isPresent = true; // denotes wehter this object exists in the scene
@@ -49,10 +51,13 @@ public class glDrawable {
     public float[] pose;
 
 
-    glDrawable(Model _model, int[] _shader, int _mOffset, float _initial_x, float _initial_y, float _intital_z) {
+    glDrawable(Model _model, int[] _shader, int _mOffset, float _initial_x, float _initial_y, float _intital_z, String _name) {
 //        switch (_model.getMode() ) {
 //            case MESH:
-                COORDS = _model.positions();
+        name = _name;
+        COORDS = _model.positions();
+        COORDS_COUNT = _model.positionsSize();
+        COLORS = _model.colors();
         try {
             NORMALS =  _model.normals();
         }
@@ -69,7 +74,6 @@ public class glDrawable {
  //       }
         prepareFloatBuffer();
         createProgram(_shader);
-//        checkGLError("Cube program");
         createParameters();
         Matrix.setIdentityM(model, 0);
         translate(_mOffset, _initial_x, _initial_y, _intital_z);
@@ -82,13 +86,13 @@ public class glDrawable {
         fbVertices.put(COORDS);
         fbVertices.position(0);
 
-        /*
+
         ByteBuffer bbColors = ByteBuffer.allocateDirect(COLORS.length * 4);
         bbColors.order(ByteOrder.nativeOrder());
         fbColors = bbColors.asFloatBuffer();
         fbColors.put(COLORS);
         fbColors.position(0);
-*/
+
 
         ByteBuffer bbNormals = ByteBuffer.allocateDirect(NORMALS.length * 4);
         bbNormals.order(ByteOrder.nativeOrder());
@@ -96,7 +100,7 @@ public class glDrawable {
         fbNormals.put(NORMALS);
         fbNormals.position(0);
 
-        checkGLError(TAG + ": Setting Byte Buffers");
+        checkGLError(TAG + " " + name + ": Setting Byte Buffers");
 
 
 //        ByteBuffer bbFoundColors = ByteBuffer.allocateDirect(_d.ACTIVE_COLORS.length * 4);
@@ -126,7 +130,7 @@ public class glDrawable {
         }
         GLES20.glLinkProgram(program);
         GLES20.glUseProgram(program);
-        checkGLError(TAG + ": Create Program");
+        checkGLError(TAG + " " + name + ": Create Program");
     }
 
     private void createParameters() {
@@ -143,18 +147,18 @@ public class glDrawable {
         GLES20.glEnableVertexAttribArray(normalParam);
         GLES20.glEnableVertexAttribArray(colorParam);
 
-        checkGLError(TAG + ": Create Parameters");
+        checkGLError(TAG + " " + name + ": Create Parameters");
     }
 
     private void translate(int _mOffset, float _x, float _y, float _z){
         Matrix.translateM(model, _mOffset, _x, _y, _z);
     }
 
-    public void draw(float[] _modelView, float[] _modelViewProjection) {
+    public void draw(float[] _modelView, float[] _modelViewProjection, float[] _lightPosInEyeSpace) {
         GLES20.glUseProgram(program);
 
         // Set ModelView, MVP, position, normals, and color.
-        GLES20.glUniform3fv(lightPosParam, 1, lightPosInEyeSpace, 0);
+        GLES20.glUniform3fv(lightPosParam, 1, _lightPosInEyeSpace, 0);
         GLES20.glUniformMatrix4fv(modelParam, 1, false, model, 0);
         GLES20.glUniformMatrix4fv(modelViewParam, 1, false, _modelView, 0);
         GLES20.glUniformMatrix4fv(modelViewProjectionParam, 1, false,
@@ -163,11 +167,11 @@ public class glDrawable {
                 false, 0, fbVertices);
         GLES20.glVertexAttribPointer(normalParam, 3, GLES20.GL_FLOAT, false, 0,
                 fbNormals);
-//        GLES20.glVertexAttribPointer(colorParam, 4, GLES20.GL_FLOAT, false, 0, fbColors);
+        GLES20.glVertexAttribPointer(colorParam, 4, GLES20.GL_FLOAT, false, 0, fbColors);
 
-        GLES20.glDrawArrays(GLES20.GL_TRIANGLES, 0, 6);
+        GLES20.glDrawArrays(GLES20.GL_TRIANGLES, 0, COORDS_COUNT);
 
-        checkGLError(TAG + ": Draw");
+        checkGLError(TAG + " " + name + ": Draw");
     }
 
     /**
