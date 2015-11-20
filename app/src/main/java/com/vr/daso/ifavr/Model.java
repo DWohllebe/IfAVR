@@ -16,6 +16,8 @@ public class Model {
     private int npoints = 0;
     private int ncolors = 0;
 
+    private int nverticestotal = 0;
+
 //    private float positions[][];    // XYZ
 //    private float texels[][];          // UV
 //    private float normals[][];        // XYZ
@@ -40,18 +42,7 @@ public class Model {
     }
 
     float[] positions() {
-//        Float[] returnval = new Float[positions.size()];
-        int offs = 0;
-        float[] part = new float[3];
-        float[] floaty = new float[positions.size()*3];
-        for (int i = 0; i < positions.size()/3; i++) {
-            part = positions.get(i);
-            for (int j = 0; j < 3; j++) {
-                floaty[offs + j] = part[j];
-            }
-            offs += 3;
-        }
-        return floaty;
+        return collectFromFaces(0, DATATYPE.VERTICES);
     }
 
     void addPositions(float _x, float _y, float _z) {
@@ -85,17 +76,7 @@ public class Model {
     }
 
     float[] normals() {
-        int offs = 0;
-        float[] part = new float[3];
-        float[] normy = new float[normals.size()*3];
-        for (int i = 0; i < normals.size()/3; i++) {
-            part = normals.get(i);
-            for (int j = 0; j < 3; j++) {
-                normy[offs + j] = part[j];
-            }
-            offs += 3;
-        }
-        return normy;
+        return collectFromFaces(2, DATATYPE.NORMALS);
     }
 
     void addNormals(float _x, float _y, float _z) {
@@ -135,17 +116,7 @@ public class Model {
     }
 
     float[] colors() {
-        int offs = 0;
-        float[] part = new float[4];
-        float[] coloy = new float[colors.size()*3];
-        for (int i = 0; i < colors.size()/4; i++) {
-            part = colors.get(i);
-            for (int j = 0; j < 4; j++) {
-                coloy[offs + j] = part[j];
-            }
-            offs += 4;
-        }
-        return coloy;
+        return collectFromFaces(0, DATATYPE.COLORS);
     }
 
     void addColors(float _red, float _green, float _blue, float _alpha) {
@@ -157,6 +128,39 @@ public class Model {
         else {
             Log.e(TAG, "addColors could not be called. Model is already finalized!");
         }
+    }
+
+    enum DATATYPE {VERTICES, NORMALS, COLORS}
+    float[] collectFromFaces(int _offset, DATATYPE _datatype) {
+        int offs = 0;
+        float[] part;
+        float[] normy;
+        int rep;
+        switch (_datatype) {
+            case COLORS: rep = 4; normy = new float[faces.size()*12]; break;
+            default: rep = 3; normy = new float[faces.size()*9]; break;
+        }
+
+        for (int i = 0; i < faces.size(); i++) {  // for all faces
+            for (int fi = _offset; fi < 9; fi += 3) { // a single face has three vertices that are defined within
+                switch (_datatype) {
+                    case VERTICES: part = positions.get((faces.get(i))[fi] - 1); break; // we extract a single vertice
+                    case NORMALS: part = normals.get((faces.get(i))[fi] - 1); break;
+                    case COLORS: part = colors.get(0); break; // TODO: Adjust for multiple colors
+                    default: return normy;
+                }
+                for (int j = 0; j < rep; j++) { //then we write it to our array
+                    normy[offs + j] = part[j];
+                }
+                nverticestotal++;
+                offs += rep;
+            }
+        }
+        return normy;
+    }
+
+    int verticesTotal() {
+        return nverticestotal;
     }
 
     Object[] points() {

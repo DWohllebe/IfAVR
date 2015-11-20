@@ -56,7 +56,7 @@ public class glDrawable {
 //            case MESH:
         name = _name;
         COORDS = _model.positions();
-        COORDS_COUNT = _model.positionsSize();
+        COORDS_COUNT = _model.verticesTotal();
         COLORS = _model.colors();
         try {
             NORMALS =  _model.normals();

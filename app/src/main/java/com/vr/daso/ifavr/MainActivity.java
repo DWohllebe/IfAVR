@@ -62,7 +62,8 @@ public class MainActivity extends CardboardActivity implements CardboardView.Ste
     private static final float Z_NEAR = 0.1f;
     private static final float Z_FAR = 100.0f;
 
-    private static final float CAMERA_Z = 0.01f;
+    private static float CAMERA_Z = /*0.01f*/ -5.40f;
+    private static float CAMERA_Y = -19f;
     private static final float TIME_DELTA = 0.3f;
 
     private static final float YAW_LIMIT = 0.12f;
@@ -192,7 +193,7 @@ public class MainActivity extends CardboardActivity implements CardboardView.Ste
         vibrator = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
 
         overlayView = (CardboardOverlayView) findViewById(R.id.overlay);
-        overlayView.show3DToast("This is a text which can be displayed to give you additional information.");
+        overlayView.show3DToast("Welcome!");
     }
 
     @Override
@@ -273,10 +274,15 @@ public class MainActivity extends CardboardActivity implements CardboardView.Ste
         int[] teapotshaders = {vertexShader, passthroughShader};
 //      glDrawable glTeapot = interpreter.load("res/gldrawable/teapot.obj", potshaders, 0, 0, 0, -objectDistance);
         drawableObjects.add( interpreter.load(
-                getResources().openRawResource(R.raw.teapot),  // OBJ-Datei
+                getResources().openRawResource(R.raw.josie_rizal),  // OBJ-Datei
                 teapotshaders, // Shader
                 0, 0, 0, -objectDistance) // Initiale Position
         );
+//        drawableObjects.add( interpreter.load(
+//                getResources().openRawResource(R.raw.cube),  // OBJ-Datei
+//                teapotshaders, // Shader
+//                0, 0, -19, objectDistance) // Initiale Position
+//        );
 
 //        cubeProgram = GLES20.glCreateProgram();
 //        GLES20.glAttachShader(cubeProgram, vertexShader);
@@ -380,7 +386,7 @@ public class MainActivity extends CardboardActivity implements CardboardView.Ste
 //        Matrix.rotateM(modelCube, 0, TIME_DELTA, 0.5f, 0.5f, 1.0f);
 
         // Build the camera matrix and apply it to the ModelView.
-        Matrix.setLookAtM(camera, 0, 0.0f, 0.0f, CAMERA_Z, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f);
+        Matrix.setLookAtM(camera, 0, 0.0f, CAMERA_Y, CAMERA_Z, 0.0f, CAMERA_Y, 0.0f, 0.0f, 1.0f, 0.0f);
 
         headTransform.getHeadView(headView, 0);
 
@@ -514,13 +520,15 @@ public class MainActivity extends CardboardActivity implements CardboardView.Ste
     public void onCardboardTrigger() {
         Log.i(TAG, "onCardboardTrigger");
 
-        if (isLookingAtObject()) {
-            score++;
-            overlayView.show3DToast("Found it! Look around for another one.\nScore = " + score);
-            hideObject();
-        } else {
-            overlayView.show3DToast("Look around to find the object!");
-        }
+//        if (isLookingAtObject()) {
+//            score++;
+//            overlayView.show3DToast("Found it! Look around for another one.\nScore = " + score);
+//            hideObject();
+//        } else {
+//            overlayView.show3DToast("Look around to find the object!");
+//        }
+
+        CAMERA_Z++;
 
         // Always give user feedback.
         vibrator.vibrate(50);
