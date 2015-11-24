@@ -1,6 +1,7 @@
 package com.vr.daso.ifavr;
 
 import android.annotation.SuppressLint;
+import android.os.AsyncTask;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -21,6 +22,13 @@ import android.opengl.Matrix;
 import android.os.Bundle;
 import android.os.Vibrator;
 import android.util.Log;
+import android.widget.TextView;
+
+import org.ksoap2.SoapEnvelope;
+import org.ksoap2.serialization.PropertyInfo;
+import org.ksoap2.serialization.SoapObject;
+import org.ksoap2.serialization.SoapSerializationEnvelope;
+import org.ksoap2.transport.HttpTransportSE;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -125,6 +133,8 @@ public class MainActivity extends CardboardActivity implements CardboardView.Ste
     private Vibrator vibrator;
     private CardboardOverlayView overlayView;
 
+    private Category pumpInformation;
+
     /**
      * Converts a raw text file, saved as a resource, into an OpenGL ES shader.
      *
@@ -191,6 +201,11 @@ public class MainActivity extends CardboardActivity implements CardboardView.Ste
         modelFloor = new float[16];
         headView = new float[16];
         vibrator = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
+
+        WebServiceTask webTask = (WebServiceTask)new WebServiceTask().execute(
+                "http://tu-dresden.de/ifa/",
+                "http://opcfoundation.org/webservices/XMLDA/1.0/Read",
+                "http://141.30.154.211:8087/OPC/DA" );
 
         overlayView = (CardboardOverlayView) findViewById(R.id.overlay);
         overlayView.show3DToast("Welcome!");
@@ -581,4 +596,81 @@ public class MainActivity extends CardboardActivity implements CardboardView.Ste
 
         return Math.abs(pitch) < PITCH_LIMIT && Math.abs(yaw) < YAW_LIMIT;
     }
+
+    /**
+     * Created by Daniel on 24.11.2015.
+     * Based on the tutorial: http://seesharpgears.blogspot.de/2010/10/ksoap-android-web-service-tutorial-with.html
+     */
+    private class WebServiceTask extends AsyncTask<String, Category, Category> {
+        Category C;
+
+        protected Category doInBackground(String... strings) {
+            while (true) {
+                int count = strings.length;
+
+                final String NAMESPACE = strings[0];
+                final String METHOD_NAME = strings[1];
+                final String SOAP_ACTION = NAMESPACE + METHOD_NAME;
+                final String URL = strings[2];
+
+                SoapObject Request = new SoapObject(NAMESPACE, METHOD_NAME);
+
+        /*
+         * Create Category with Id to be passed as an argument
+         *
+         * */
+                C = new Category();
+                C.CategoryId = 1;
+
+        /*
+         * Set the category to be the argument of the web service method
+         *
+         * */
+                PropertyInfo pi = new PropertyInfo();
+                pi.setName("C");
+                pi.setValue(C);
+                pi.setType(C.getClass());
+                Request.addProperty(pi);
+
+        /*
+         * Set the web service envelope
+         *
+         * */
+                SoapSerializationEnvelope envelope = new SoapSerializationEnvelope(SoapEnvelope.VER11);
+                envelope.dotNet = true;
+                envelope.setOutputSoapObject(Request);
+
+                envelope.addMapping(NAMESPACE, "Category", new Category().getClass());
+                HttpTransportSE androidHttpTransport = new HttpTransportSE(URL);
+        /*
+         * Call the web service and retrieve result
+         *
+         * */
+                try {
+                    androidHttpTransport.call(SOAP_ACTION, envelope);
+                    SoapObject response = (SoapObject) envelope.getResponse();
+                    C.CategoryId = Integer.parseInt(response.getProperty(0).toString());
+                    C.Name = response.getProperty(1).toString();
+                    C.Description = (String) response.getProperty(2).toString();
+                    publishProgress(C);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+                if (isCancelled()) {
+                    return C;
+                }
+            }
+        }
+
+
+        protected void onProgressUpdate(Category... progress) {
+            pumpInformation = progress[0];
+        }
+
+        protected void onPostExecute(Category result) {
+            pumpInformation = result;
+        }
+
+    }
+
 }
