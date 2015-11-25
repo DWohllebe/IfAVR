@@ -1,5 +1,9 @@
 package com.vr.daso.ifavr;
 
+import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.opengl.GLUtils;
 import android.util.Log;
 import android.opengl.GLES20;
 import android.opengl.Matrix;
@@ -20,12 +24,9 @@ public class glDrawable {
     private float[] COLORS;
     private float[] ACTIVE_COLORS;
     private float[] NORMALS;
+    private float[] TEXELS;
 
     private int COORDS_COUNT = 0;
-
-    private float[] normals;
-    private float[] vertices;
-    private float[] colors;
 
     private int program;
     private int positionParam;
@@ -38,28 +39,37 @@ public class glDrawable {
     private float[] model = new float[16];
     private float[] lightPosInEyeSpace;
 
+    private int texelParam;
+    private int texelCoordParam;
+
     private FloatBuffer fbVertices;
     private FloatBuffer fbColors;
     private FloatBuffer fbNormals;
+    private FloatBuffer fbTexels;
 
     private final String name;
 
     private boolean isInteractable = false; //this should be relegated to an interface
     private boolean isPresent = true; // denotes wehter this object exists in the scene
     private boolean isHidden = false; // denotes wether this object should be hidden
+    private boolean hasTexture = false;
 
     public float[] pose;
+
+    private final int TEXTURE_COORDINATE_DATA_SIZE = 2;
+    private int textureDataHandle; // TODO: refactor
 
 
     glDrawable(Model _model, int[] _shader, int _mOffset, float _initial_x, float _initial_y, float _intital_z, String _name) {
 //        switch (_model.getMode() ) {
 //            case MESH:
         name = _name;
-        COORDS = _model.positions();
-        COORDS_COUNT = _model.verticesTotal();
-        COLORS = _model.colors();
         try {
+            COORDS = _model.positions();
+            COORDS_COUNT = _model.verticesTotal();
+            COLORS = _model.colors();
             NORMALS =  _model.normals();
+            TEXELS = _model.texels();
         }
         catch(Exception e) {
             Log.e(TAG, e.getMessage());
@@ -100,7 +110,12 @@ public class glDrawable {
         fbNormals.put(NORMALS);
         fbNormals.position(0);
 
-        checkGLError(TAG + " " + name + ": Setting Byte Buffers");
+
+        ByteBuffer bbTexels = ByteBuffer.allocateDirect(TEXELS.length * 4);
+        bbNormals.order(ByteOrder.nativeOrder());
+        fbTexels = bbTexels.asFloatBuffer();
+        fbTexels.put(TEXELS);
+        fbTexels.position(0);
 
 
 //        ByteBuffer bbFoundColors = ByteBuffer.allocateDirect(_d.ACTIVE_COLORS.length * 4);
@@ -109,6 +124,7 @@ public class glDrawable {
 //        cubeFoundColors.put(_d.ACTIVE_COLORS);
 //        cubeFoundColors.position(0);
 
+        checkGLError(TAG + " " + name + ": Setting Byte Buffers");
     }
 
     void attachShader(int _shader) {
@@ -154,7 +170,18 @@ public class glDrawable {
         Matrix.translateM(model, _mOffset, _x, _y, _z);
     }
 
+    /**
+     * Draws the Object.
+     * @param _modelView
+     * @param _modelViewProjection
+     * @param _lightPosInEyeSpace
+     */
     public void draw(float[] _modelView, float[] _modelViewProjection, float[] _lightPosInEyeSpace) {
+        if (hasTexture) {
+            texelParam = GLES20.glGetUniformLocation(program, "u_Texture");
+            texelCoordParam = GLES20.glGetAttribLocation(program, "a_TexCoordinate");
+        }
+
         GLES20.glUseProgram(program);
 
         // Set ModelView, MVP, position, normals, and color.
@@ -168,6 +195,19 @@ public class glDrawable {
         GLES20.glVertexAttribPointer(normalParam, 3, GLES20.GL_FLOAT, false, 0,
                 fbNormals);
         GLES20.glVertexAttribPointer(colorParam, 4, GLES20.GL_FLOAT, false, 0, fbColors);
+
+        if ( hasTexture ) {
+            GLES20.glVertexAttribPointer(texelParam, 2, GLES20.GL_FLOAT, false, 0, fbTexels);
+
+            // Set the active texture unti to texture unit 0
+            GLES20.glActiveTexture(GLES20.GL_TEXTURE0); // TODO: for multiple textures, this needs to be refactored
+
+            // Bind the texture to this unit
+            GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, textureDataHandle);
+
+            // Tell the texture uniform smapler to use this texture in the shader by binding to texture unit 0
+            GLES20.glUniform1i(texelParam, 0);
+        }
 
         GLES20.glDrawArrays(GLES20.GL_TRIANGLES, 0, COORDS_COUNT);
 
@@ -186,4 +226,45 @@ public class glDrawable {
             throw new RuntimeException(label + ": glError " + error);
         }
     }
+
+    /**
+     * Load a texture from an image file.
+     * @param context Context of the application
+     * @param resourceId the ID of the image-resource that should serve as a texture
+     */
+    public void loadTexture(final Context context, final int resourceId) {
+        // create a unique identifier for the texture
+        final int[] textureHandle = new int[1];
+        GLES20.glGenTextures(1, textureHandle, 0);
+
+        //decode the image file into an Android Bitmap object
+        if (textureHandle[0] != 0) {
+            final BitmapFactory.Options options = new BitmapFactory.Options();
+            options.inScaled = false; // no pre-scaling
+
+            // Read the resource in
+            final Bitmap bitmap = BitmapFactory.decodeResource(context.getResources(), resourceId, options);
+
+            // Bind to the texture in OpenGL
+            GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, textureHandle[0]);
+
+            // Set filtering
+            GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_MIN_FILTER, GLES20.GL_NEAREST);
+            GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_MAG_FILTER, GLES20.GL_NEAREST);
+
+            // Load the bitmap into the bound texture
+            GLUtils.texImage2D(GLES20.GL_TEXTURE_2D, 0, bitmap, 0);
+            // Recycle the bitmap
+            bitmap.recycle();
+
+            textureDataHandle =  textureHandle[0];
+            GLES20.glEnableVertexAttribArray(texelParam);
+            hasTexture = true;
+            return;
+        }
+
+        throw new RuntimeException("Error loading texture.");
+
+     }
+
 }

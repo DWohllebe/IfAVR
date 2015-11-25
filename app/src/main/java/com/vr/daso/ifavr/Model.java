@@ -60,8 +60,8 @@ public class Model {
         return npositions;
     }
 
-    Object[] texels() {
-        return texels.toArray();
+    float[] texels() {
+        return collectFromFaces(0, DATATYPE.TEXELS);
     }
 
     void addTexels(float _uv1, float _uv2) {
@@ -130,7 +130,7 @@ public class Model {
         }
     }
 
-    enum DATATYPE {VERTICES, NORMALS, COLORS}
+    enum DATATYPE {VERTICES, NORMALS, COLORS, TEXELS}
     float[] collectFromFaces(int _offset, DATATYPE _datatype) {
         int offs = 0;
         float[] part;
@@ -138,6 +138,7 @@ public class Model {
         int rep;
         switch (_datatype) {
             case COLORS: rep = 4; normy = new float[faces.size()*12]; break;
+            case TEXELS: rep = 2; normy = new float[faces.size()*6]; break;
             default: rep = 3; normy = new float[faces.size()*9]; break;
         }
 
@@ -146,6 +147,7 @@ public class Model {
                 switch (_datatype) {
                     case VERTICES: part = positions.get((faces.get(i))[fi] - 1); break; // we extract a single vertice
                     case NORMALS: part = normals.get((faces.get(i))[fi] - 1); break;
+                    case TEXELS : part = texels.get((faces.get(i))[fi] - 1); break;
                     case COLORS: part = colors.get(0); break; // TODO: Adjust for multiple colors
                     default: return normy;
                 }

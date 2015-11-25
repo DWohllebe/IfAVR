@@ -48,7 +48,7 @@ public class Interpreter {
                                 float y = Float.parseFloat(linetokens.get(2));
                                 float z = Float.parseFloat(linetokens.get(3));
                                 model.addPositions(x, y, z);
-                                model.addColors(0.8359375f,  0.17578125f,  0.125f, 1.0f);
+                                model.addColors(0.8359375f,  0.17578125f,  0.125f, 0.5f);
                             }
                             if (linetokens.get(0).contentEquals("vt")) {
                                 float uv1 = Float.parseFloat(linetokens.get(1));
