@@ -72,7 +72,12 @@ public class MainActivity extends CardboardActivity implements CardboardView.Ste
 
     private static float CAMERA_Z = /*0.01f*/ -5.40f;
     private static float CAMERA_Y = -19f;
+    private static float CAMERA_X = 0.0f;
     private static final float TIME_DELTA = 0.3f;
+
+    private static float CAMERA_CENTER_X = 0.0f;
+    private static float CAMERA_CENTER_Y = CAMERA_Y;
+    private static float CAMERA_CENTER_Z = 0.0f;
 
     private static final float YAW_LIMIT = 0.12f;
     private static final float PITCH_LIMIT = 0.12f;
@@ -401,7 +406,7 @@ public class MainActivity extends CardboardActivity implements CardboardView.Ste
 //        Matrix.rotateM(modelCube, 0, TIME_DELTA, 0.5f, 0.5f, 1.0f);
 
         // Build the camera matrix and apply it to the ModelView.
-        Matrix.setLookAtM(camera, 0, 0.0f, CAMERA_Y, CAMERA_Z, 0.0f, CAMERA_Y, 0.0f, 0.0f, 1.0f, 0.0f);
+        Matrix.setLookAtM(camera, 0, CAMERA_X, CAMERA_Y, CAMERA_Z, CAMERA_CENTER_X, CAMERA_CENTER_Y, CAMERA_CENTER_Z, 0.0f, 1.0f, 0.0f);
 
         headTransform.getHeadView(headView, 0);
 
@@ -543,7 +548,7 @@ public class MainActivity extends CardboardActivity implements CardboardView.Ste
 //            overlayView.show3DToast("Look around to find the object!");
 //        }
 
-        CAMERA_Z++;
+        moveCameraInViewDirection(0.1f);
 
         // Always give user feedback.
         vibrator.vibrate(50);
@@ -595,6 +600,23 @@ public class MainActivity extends CardboardActivity implements CardboardView.Ste
         float yaw = (float) Math.atan2(objPositionVec[0], -objPositionVec[2]);
 
         return Math.abs(pitch) < PITCH_LIMIT && Math.abs(yaw) < YAW_LIMIT;
+    }
+
+    private void moveCameraInViewDirection(float _distance) {
+        float yaw = (float) Math.atan2( headView[4], headView[1] );
+     //   float pitch = (float) Math.atan2( -headView[8], Math.sqrt(Math.pow(headView[9], 2) + Math.pow( headView[10], 2) ) );
+        float roll = (float) Math.atan2( headView[9], headView[10]);
+
+        float dX = (float) (_distance * Math.sin(yaw) * Math.cos(roll) );
+        float dY = (float) (_distance * Math.sin(yaw) * Math.sin(roll) );
+        float dZ = (float) (_distance * Math.cos(yaw) );
+
+        CAMERA_X += dX;
+        CAMERA_CENTER_X += dX;
+        CAMERA_Y += dY;
+        CAMERA_CENTER_Y += dY;
+        CAMERA_Z += dZ;
+        CAMERA_CENTER_Z += dZ;
     }
 
     /**
