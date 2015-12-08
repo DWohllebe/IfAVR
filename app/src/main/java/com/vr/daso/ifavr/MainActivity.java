@@ -27,6 +27,7 @@ import android.widget.TextView;
 import org.ksoap2.SoapEnvelope;
 import org.ksoap2.serialization.PropertyInfo;
 import org.ksoap2.serialization.SoapObject;
+import org.ksoap2.serialization.SoapPrimitive;
 import org.ksoap2.serialization.SoapSerializationEnvelope;
 import org.ksoap2.transport.HttpTransportSE;
 
@@ -72,7 +73,12 @@ public class MainActivity extends CardboardActivity implements CardboardView.Ste
 
     private static float CAMERA_Z = /*0.01f*/ -5.40f;
     private static float CAMERA_Y = -19f;
+    private static float CAMERA_X = 0.0f;
     private static final float TIME_DELTA = 0.3f;
+
+    private static float CAMERA_CENTER_X = 0.0f;
+    private static float CAMERA_CENTER_Y = CAMERA_Y;
+    private static float CAMERA_CENTER_Z = 0.0f;
 
     private static final float YAW_LIMIT = 0.12f;
     private static final float PITCH_LIMIT = 0.12f;
@@ -203,9 +209,9 @@ public class MainActivity extends CardboardActivity implements CardboardView.Ste
         vibrator = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
 
         WebServiceTask webTask = (WebServiceTask)new WebServiceTask().execute(
-                "http://tu-dresden.de/ifa/",
-                "http://opcfoundation.org/webservices/XMLDA/1.0/Read",
-                "http://141.30.154.211:8087/OPC/DA" );
+               /* "http://tu-dresden.de/ifa/"*/"http://www.webserviceX.NET/",
+                /*"http://opcfoundation.org/webservices/XMLDA/1.0/Read"*/"GetAtoms",
+                /*"http://141.30.154.211:8087/OPC/DA"*/"http://www.webservicex.net/periodictable.asmx" );
 
         overlayView = (CardboardOverlayView) findViewById(R.id.overlay);
         overlayView.show3DToast("Welcome!");
@@ -401,7 +407,7 @@ public class MainActivity extends CardboardActivity implements CardboardView.Ste
 //        Matrix.rotateM(modelCube, 0, TIME_DELTA, 0.5f, 0.5f, 1.0f);
 
         // Build the camera matrix and apply it to the ModelView.
-        Matrix.setLookAtM(camera, 0, 0.0f, CAMERA_Y, CAMERA_Z, 0.0f, CAMERA_Y, 0.0f, 0.0f, 1.0f, 0.0f);
+        Matrix.setLookAtM(camera, 0, CAMERA_X, CAMERA_Y, CAMERA_Z, CAMERA_CENTER_X, CAMERA_CENTER_Y, CAMERA_CENTER_Z, 0.0f, 1.0f, 0.0f);
 
         headTransform.getHeadView(headView, 0);
 
@@ -543,7 +549,7 @@ public class MainActivity extends CardboardActivity implements CardboardView.Ste
 //            overlayView.show3DToast("Look around to find the object!");
 //        }
 
-        CAMERA_Z++;
+        moveCameraInViewDirection(0.1f);
 
         // Always give user feedback.
         vibrator.vibrate(50);
@@ -597,6 +603,23 @@ public class MainActivity extends CardboardActivity implements CardboardView.Ste
         return Math.abs(pitch) < PITCH_LIMIT && Math.abs(yaw) < YAW_LIMIT;
     }
 
+    private void moveCameraInViewDirection(float _distance) {
+        float yaw = (float) Math.atan2( headView[4], headView[1] );
+        float pitch = (float) Math.atan2( -headView[8], Math.sqrt(Math.pow(headView[9], 2) + Math.pow( headView[10], 2) ) );
+     //   float roll = (float) Math.atan2( headView[9], headView[10]);
+
+        float dX = (float) (_distance * Math.sin(yaw) * Math.cos(pitch) );
+        float dY = (float) (_distance * Math.sin(yaw) * Math.sin(pitch) );
+        float dZ = (float) (_distance * Math.cos(yaw) );
+
+        CAMERA_X += dX;
+        CAMERA_CENTER_X += dX;
+        CAMERA_Y += dY;
+        CAMERA_CENTER_Y += dY;
+        CAMERA_Z += dZ;
+        CAMERA_CENTER_Z += dZ;
+    }
+
     /**
      * Created by Daniel on 24.11.2015.
      * Based on the tutorial: http://seesharpgears.blogspot.de/2010/10/ksoap-android-web-service-tutorial-with.html
@@ -626,11 +649,11 @@ public class MainActivity extends CardboardActivity implements CardboardView.Ste
          * Set the category to be the argument of the web service method
          *
          * */
-                PropertyInfo pi = new PropertyInfo();
-                pi.setName("C");
-                pi.setValue(C);
-                pi.setType(C.getClass());
-                Request.addProperty(pi);
+//                PropertyInfo pi = new PropertyInfo();
+//                pi.setName("C");
+//                pi.setValue(C);
+//                pi.setType(C.getClass());
+//                Request.addProperty(pi);
 
         /*
          * Set the web service envelope
@@ -648,10 +671,10 @@ public class MainActivity extends CardboardActivity implements CardboardView.Ste
          * */
                 try {
                     androidHttpTransport.call(SOAP_ACTION, envelope);
-                    SoapObject response = (SoapObject) envelope.getResponse();
-                    C.CategoryId = Integer.parseInt(response.getProperty(0).toString());
-                    C.Name = response.getProperty(1).toString();
-                    C.Description = (String) response.getProperty(2).toString();
+                    SoapPrimitive response = (SoapPrimitive) envelope.getResponse();
+//                    C.CategoryId = Integer.parseInt(response.toString());
+                    C.Name = response.getName();
+                    C.Description = response.toString();//(String) response.getProperty(2).toString();
                     publishProgress(C);
                 } catch (Exception e) {
                     e.printStackTrace();
