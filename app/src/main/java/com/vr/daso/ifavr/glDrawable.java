@@ -15,7 +15,7 @@ import java.nio.FloatBuffer;
 /**
  * Created by Daniel on 03.11.2015.
  */
-public class glDrawable implements Animated {
+public class glDrawable {
     private final String TAG = "glDrawableObject";
     private String objectTag;
 
@@ -37,6 +37,7 @@ public class glDrawable implements Animated {
     private int modelViewParam;
     private int modelViewProjectionParam;
     private int lightPosParam;
+    private float[] BASE_MODEL = new float[16];
     private float[] model = new float[16];
     private float[] lightPosInEyeSpace;
 
@@ -63,8 +64,7 @@ public class glDrawable implements Animated {
     private final int TEXTURE_COORDINATE_DATA_SIZE = 2;
     private int textureDataHandle; // TODO: refactor
 
-    private boolean animationEnabled = false;
-    private boolean animationPaused = false;
+    private Animator animator;
 
 
     glDrawable(Model _model, int[] _shader, int _mOffset, float _initial_x, float _initial_y, float _intital_z, String _name, String _tag) {
@@ -96,7 +96,9 @@ public class glDrawable implements Animated {
         createProgram(_shader);
         createParameters();
         Matrix.setIdentityM(model, 0);
-        translate(_mOffset, _initial_x, _initial_y, _intital_z);
+        translate(model, _mOffset, _initial_x, _initial_y, _intital_z);
+        Matrix.setIdentityM(BASE_MODEL, 0);
+        translate(BASE_MODEL, _mOffset, _initial_x, _initial_y, _intital_z);
     }
 
     private void prepareFloatBuffer() {
@@ -178,8 +180,8 @@ public class glDrawable implements Animated {
         checkGLError(TAG + " " + name + ": Create Parameters");
     }
 
-    private void translate(int _mOffset, float _x, float _y, float _z){
-        Matrix.translateM(model, _mOffset, _x, _y, _z);
+    private void translate(float[] _matrix, int _mOffset, float _x, float _y, float _z){
+        Matrix.translateM(_matrix, _mOffset, _x, _y, _z);
     }
 
     /**
@@ -284,18 +286,6 @@ public class glDrawable implements Animated {
 
      }
 
-    public void startAnimation() {
-        animationEnabled = true;
-    }
-
-    public void stopAnimation() {
-        animationEnabled = false;
-    }
-
-    public void pauseAnimation() {
-        animationPaused = true;
-    }
-
     String getName() {
         return name;
     }
@@ -304,16 +294,34 @@ public class glDrawable implements Animated {
         return objectTag;
     }
 
-    public void AnimationStep() {
-
-    }
-
     public float[] getModel() {
         return model;
     }
 
     public void setModel(float[] _model) {
         model = _model;
+    }
+
+    public void setAnimation(Animator _animator) {
+        animator = _animator;
+        animator.startAnimation();
+    }
+
+    public void prepareAnimation() {
+        if (animator != null) {
+            if (animator.isEnabled()) {
+                if (!animator.isPaused()) {
+                    animator.AnimationStep(model);  // change model according to the animation
+                } else {
+                    // nothing happens if paused
+                }
+            } else {
+                model = BASE_MODEL; // if Animation is disabled reset to initial model anc position
+            }
+        }
+        else {
+            Log.d(TAG + " " + objectTag, "No Animator defined");
+        }
     }
 
     //    abstract public void onLookedAt();

@@ -300,6 +300,20 @@ public class MainActivity extends CardboardActivity implements CardboardView.Ste
                 0, 0, -19.0f, objectDistance,   // Initiale Position
                 "Test Object") //Tag
         );
+        drawableObjects.get( getGlObjectIndexByTag("Test Object") ).setAnimation(
+                new Animator() {
+                    public void AnimationStep(float[] _model) {
+                        Matrix.rotateM(_model,
+                                0,
+                                TIME_DELTA,
+                                0.0f,
+                                0.1f,
+                                0.0f);
+                    }
+                }
+        );
+
+
 //        drawableObjects.add( interpreter.load(
 //                getResources().openRawResource(R.raw.cube),  // OBJ-Datei
 //                teapotshaders, // Shader
@@ -406,7 +420,7 @@ public class MainActivity extends CardboardActivity implements CardboardView.Ste
     public void onNewFrame(HeadTransform headTransform) {
         // Build the Model part of the ModelView matrix.
 //        Matrix.rotateM(modelCube, 0, TIME_DELTA, 0.5f, 0.5f, 1.0f);
-        try {
+/*        try {
             glDrawable animatedObject = drawableObjects.get(getGlObjectIndexByTag("Test Object") );
             float[] model = animatedObject.getModel();
             Matrix.rotateM(model,
@@ -419,6 +433,12 @@ public class MainActivity extends CardboardActivity implements CardboardView.Ste
         }
         catch (ArrayIndexOutOfBoundsException e) {
             Log.e(TAG, "Drawable Object not found");
+        }
+*/
+        // Do an animation step for every object
+        Iterator<glDrawable> it = drawableObjects.iterator();
+        while (it.hasNext()) {
+            it.next().prepareAnimation();
         }
         // Build the camera matrix and apply it to the ModelView.
         Matrix.setLookAtM(camera, 0, CAMERA_X, CAMERA_Y, CAMERA_Z, CAMERA_CENTER_X, CAMERA_CENTER_Y, CAMERA_CENTER_Z, 0.0f, 1.0f, 0.0f);
@@ -632,9 +652,9 @@ public class MainActivity extends CardboardActivity implements CardboardView.Ste
         float pitch = (float) Math.atan2(objPositionVec[1], -objPositionVec[2]);
         float yaw = (float) Math.atan2(objPositionVec[0], -objPositionVec[2]);
 
-        float dX = (float) (_distance * Math.sin(yaw) * Math.cos(pitch) );
-        float dY = (float) (_distance * Math.sin(yaw) * Math.sin(pitch) );
-        float dZ = (float) (_distance * Math.cos(yaw) );
+        float dX = (float) (_distance * Math.sin(pitch) * Math.cos(yaw) );
+        float dY = (float) (_distance * Math.sin(pitch) * Math.sin(yaw) );
+        float dZ = (float) (_distance * Math.cos(pitch) );
 
         CAMERA_X += dX;
         CAMERA_CENTER_X += dX;
