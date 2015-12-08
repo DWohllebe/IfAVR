@@ -72,9 +72,9 @@ public class MainActivity extends CardboardActivity implements CardboardView.Ste
     private static final float Z_FAR = 100.0f;
 
     private static float CAMERA_Z = /*0.01f*/ -5.40f;
-    private static float CAMERA_Y = -19f;
+    private static float CAMERA_Y = -18.0f;
     private static float CAMERA_X = 0.0f;
-    private static final float TIME_DELTA = 0.3f;
+    private static final float TIME_DELTA = 1.0f;
 
     private static float CAMERA_CENTER_X = 0.0f;
     private static float CAMERA_CENTER_Y = CAMERA_Y;
@@ -208,10 +208,10 @@ public class MainActivity extends CardboardActivity implements CardboardView.Ste
         headView = new float[16];
         vibrator = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
 
-        WebServiceTask webTask = (WebServiceTask)new WebServiceTask().execute(
-               /* "http://tu-dresden.de/ifa/"*/"http://www.webserviceX.NET/",
-                /*"http://opcfoundation.org/webservices/XMLDA/1.0/Read"*/"GetAtoms",
-                /*"http://141.30.154.211:8087/OPC/DA"*/"http://www.webservicex.net/periodictable.asmx" );
+//        WebServiceTask webTask = (WebServiceTask)new WebServiceTask().execute(
+ //              /* "http://tu-dresden.de/ifa/"*/"http://www.webserviceX.NET/",
+ //               /*"http://opcfoundation.org/webservices/XMLDA/1.0/Read"*/"GetCountries",
+ //               /*"http://141.30.154.211:8087/OPC/DA"*/"http://www.webservicex.net/country.asmx" );
 
         overlayView = (CardboardOverlayView) findViewById(R.id.overlay);
         overlayView.show3DToast("Welcome!");
@@ -295,9 +295,10 @@ public class MainActivity extends CardboardActivity implements CardboardView.Ste
         int[] teapotshaders = {vertexShader, passthroughShader};
 //      glDrawable glTeapot = interpreter.load("res/gldrawable/teapot.obj", potshaders, 0, 0, 0, -objectDistance);
         drawableObjects.add( interpreter.load(
-                getResources().openRawResource(R.raw.josie_rizal),  // OBJ-Datei
+                getResources().openRawResource(R.raw.alisabt),  // OBJ-Datei
                 teapotshaders, // Shader
-                0, 0, 0, -objectDistance) // Initiale Position
+                0, 0, -19.0f, objectDistance,   // Initiale Position
+                "Test Object") //Tag
         );
 //        drawableObjects.add( interpreter.load(
 //                getResources().openRawResource(R.raw.cube),  // OBJ-Datei
@@ -405,7 +406,20 @@ public class MainActivity extends CardboardActivity implements CardboardView.Ste
     public void onNewFrame(HeadTransform headTransform) {
         // Build the Model part of the ModelView matrix.
 //        Matrix.rotateM(modelCube, 0, TIME_DELTA, 0.5f, 0.5f, 1.0f);
-
+        try {
+            glDrawable animatedObject = drawableObjects.get(getGlObjectIndexByTag("Test Object") );
+            float[] model = animatedObject.getModel();
+            Matrix.rotateM(model,
+                    0,
+                    TIME_DELTA,
+                    0.0f,
+                    0.1f,
+                    0.0f);
+            animatedObject.setModel(model);
+        }
+        catch (ArrayIndexOutOfBoundsException e) {
+            Log.e(TAG, "Drawable Object not found");
+        }
         // Build the camera matrix and apply it to the ModelView.
         Matrix.setLookAtM(camera, 0, CAMERA_X, CAMERA_Y, CAMERA_Z, CAMERA_CENTER_X, CAMERA_CENTER_Y, CAMERA_CENTER_Z, 0.0f, 1.0f, 0.0f);
 
@@ -447,7 +461,7 @@ public class MainActivity extends CardboardActivity implements CardboardView.Ste
 
         Iterator<glDrawable> it = drawableObjects.iterator();
         while (it.hasNext()) {
-            it.next().draw(modelView, modelViewProjection, lightPosInEyeSpace);
+            it.next().draw(view, perspective, lightPosInEyeSpace);
         }
     }
 
@@ -549,7 +563,7 @@ public class MainActivity extends CardboardActivity implements CardboardView.Ste
 //            overlayView.show3DToast("Look around to find the object!");
 //        }
 
-        moveCameraInViewDirection(0.1f);
+        moveCameraInViewDirection(0.5f);
 
         // Always give user feedback.
         vibrator.vibrate(50);
@@ -604,9 +618,19 @@ public class MainActivity extends CardboardActivity implements CardboardView.Ste
     }
 
     private void moveCameraInViewDirection(float _distance) {
-        float yaw = (float) Math.atan2( headView[4], headView[1] );
-        float pitch = (float) Math.atan2( -headView[8], Math.sqrt(Math.pow(headView[9], 2) + Math.pow( headView[10], 2) ) );
+//        float yaw = (float) Math.atan2( headView[4], headView[1] );
+//        float pitch = (float) Math.atan2( -headView[8], Math.sqrt(Math.pow(headView[9], 2) + Math.pow( headView[10], 2) ) );
      //   float roll = (float) Math.atan2( headView[9], headView[10]);
+
+        float[] initVec = { 0, 0, 0, 1.0f };
+        float[] objPositionVec = new float[4];
+
+        // Convert object space to camera space. Use the headView from onNewFrame.
+        Matrix.multiplyMM(modelView, 0, headView, 0, modelCube, 0);
+        Matrix.multiplyMV(objPositionVec, 0, modelView, 0, initVec, 0);
+
+        float pitch = (float) Math.atan2(objPositionVec[1], -objPositionVec[2]);
+        float yaw = (float) Math.atan2(objPositionVec[0], -objPositionVec[2]);
 
         float dX = (float) (_distance * Math.sin(yaw) * Math.cos(pitch) );
         float dY = (float) (_distance * Math.sin(yaw) * Math.sin(pitch) );
@@ -616,8 +640,8 @@ public class MainActivity extends CardboardActivity implements CardboardView.Ste
         CAMERA_CENTER_X += dX;
         CAMERA_Y += dY;
         CAMERA_CENTER_Y += dY;
-        CAMERA_Z += dZ;
-        CAMERA_CENTER_Z += dZ;
+        CAMERA_Z -= dZ;
+        CAMERA_CENTER_Z -= dZ;
     }
 
     /**
@@ -693,7 +717,32 @@ public class MainActivity extends CardboardActivity implements CardboardView.Ste
         protected void onPostExecute(Category result) {
             pumpInformation = result;
         }
+    }
 
+    private int getGlObjectIndexByName(String _name) {
+        int loop = 0;
+        glDrawable candidate;
+        Iterator<glDrawable> it = drawableObjects.iterator();
+        while (it.hasNext()) {
+            if ( it.next().getName().matches(_name) ) {
+                return loop;
+            }
+            loop++;
+        }
+        return (-1);
+    }
+
+    private int getGlObjectIndexByTag(String _name) {
+        int loop = 0;
+        glDrawable candidate;
+        Iterator<glDrawable> it = drawableObjects.iterator();
+        while (it.hasNext()) {
+            if ( it.next().getTag().matches(_name) ) {
+                return loop;
+            }
+            loop++;
+        }
+        return (-1);
     }
 
 }

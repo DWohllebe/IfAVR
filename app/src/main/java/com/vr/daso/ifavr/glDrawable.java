@@ -15,8 +15,9 @@ import java.nio.FloatBuffer;
 /**
  * Created by Daniel on 03.11.2015.
  */
-public class glDrawable {
+public class glDrawable implements Animated {
     private final String TAG = "glDrawableObject";
+    private String objectTag;
 
     private static final int COORDS_PER_VERTEX = 3;
 
@@ -39,6 +40,9 @@ public class glDrawable {
     private float[] model = new float[16];
     private float[] lightPosInEyeSpace;
 
+    private float[] modelViewProjection;
+    private float[] modelView;
+
     private int texelParam;
     private int texelCoordParam;
 
@@ -59,11 +63,17 @@ public class glDrawable {
     private final int TEXTURE_COORDINATE_DATA_SIZE = 2;
     private int textureDataHandle; // TODO: refactor
 
+    private boolean animationEnabled = false;
+    private boolean animationPaused = false;
 
-    glDrawable(Model _model, int[] _shader, int _mOffset, float _initial_x, float _initial_y, float _intital_z, String _name) {
+
+    glDrawable(Model _model, int[] _shader, int _mOffset, float _initial_x, float _initial_y, float _intital_z, String _name, String _tag) {
 //        switch (_model.getMode() ) {
 //            case MESH:
         name = _name;
+        objectTag = _tag;
+        modelViewProjection = new float[16];
+        modelView = new float[16];
         try {
             COORDS = _model.positions();
             COORDS_COUNT = _model.verticesTotal();
@@ -96,13 +106,11 @@ public class glDrawable {
         fbVertices.put(COORDS);
         fbVertices.position(0);
 
-
         ByteBuffer bbColors = ByteBuffer.allocateDirect(COLORS.length * 4);
         bbColors.order(ByteOrder.nativeOrder());
         fbColors = bbColors.asFloatBuffer();
         fbColors.put(COLORS);
         fbColors.position(0);
-
 
         ByteBuffer bbNormals = ByteBuffer.allocateDirect(NORMALS.length * 4);
         bbNormals.order(ByteOrder.nativeOrder());
@@ -110,12 +118,16 @@ public class glDrawable {
         fbNormals.put(NORMALS);
         fbNormals.position(0);
 
-
-        ByteBuffer bbTexels = ByteBuffer.allocateDirect(TEXELS.length * 4);
-        bbNormals.order(ByteOrder.nativeOrder());
-        fbTexels = bbTexels.asFloatBuffer();
-        fbTexels.put(TEXELS);
-        fbTexels.position(0);
+        if (TEXELS != null) {
+            ByteBuffer bbTexels = ByteBuffer.allocateDirect(TEXELS.length * 4);
+            bbNormals.order(ByteOrder.nativeOrder());
+            fbTexels = bbTexels.asFloatBuffer();
+            fbTexels.put(TEXELS);
+            fbTexels.position(0);
+        }
+        else {
+           Log.e(TAG, "Texels are null");
+        }
 
 
 //        ByteBuffer bbFoundColors = ByteBuffer.allocateDirect(_d.ACTIVE_COLORS.length * 4);
@@ -172,24 +184,29 @@ public class glDrawable {
 
     /**
      * Draws the Object.
-     * @param _modelView
-     * @param _modelViewProjection
+     * @param _view
+     * @param _perspective
      * @param _lightPosInEyeSpace
      */
-    public void draw(float[] _modelView, float[] _modelViewProjection, float[] _lightPosInEyeSpace) {
+    public void draw(float[] _view, float[] _perspective, float[] _lightPosInEyeSpace) {
+        createParameters();
         if (hasTexture) {
             texelParam = GLES20.glGetUniformLocation(program, "u_Texture");
             texelCoordParam = GLES20.glGetAttribLocation(program, "a_TexCoordinate");
         }
+
+        Matrix.multiplyMM(modelView, 0, _view, 0, model, 0);
+        Matrix.multiplyMM(modelViewProjection, 0, _perspective, 0,
+                modelView, 0);
 
         GLES20.glUseProgram(program);
 
         // Set ModelView, MVP, position, normals, and color.
         GLES20.glUniform3fv(lightPosParam, 1, _lightPosInEyeSpace, 0);
         GLES20.glUniformMatrix4fv(modelParam, 1, false, model, 0);
-        GLES20.glUniformMatrix4fv(modelViewParam, 1, false, _modelView, 0);
+        GLES20.glUniformMatrix4fv(modelViewParam, 1, false, modelView, 0);
         GLES20.glUniformMatrix4fv(modelViewProjectionParam, 1, false,
-                _modelViewProjection, 0);
+                modelViewProjection, 0);
         GLES20.glVertexAttribPointer(positionParam, COORDS_PER_VERTEX, GLES20.GL_FLOAT,
                 false, 0, fbVertices);
         GLES20.glVertexAttribPointer(normalParam, 3, GLES20.GL_FLOAT, false, 0,
@@ -266,5 +283,42 @@ public class glDrawable {
         throw new RuntimeException("Error loading texture.");
 
      }
+
+    public void startAnimation() {
+        animationEnabled = true;
+    }
+
+    public void stopAnimation() {
+        animationEnabled = false;
+    }
+
+    public void pauseAnimation() {
+        animationPaused = true;
+    }
+
+    String getName() {
+        return name;
+    }
+
+    String getTag() {
+        return objectTag;
+    }
+
+    public void AnimationStep() {
+
+    }
+
+    public float[] getModel() {
+        return model;
+    }
+
+    public void setModel(float[] _model) {
+        model = _model;
+    }
+
+    //    abstract public void onLookedAt();
+
+//    @Override
+
 
 }

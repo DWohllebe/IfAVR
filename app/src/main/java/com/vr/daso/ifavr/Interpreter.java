@@ -27,12 +27,13 @@ public class Interpreter {
         public String nameJAV;
     }
 
-    glDrawable load(InputStream _file, int[] _shader, int _mOffset, float _initial_x, float _initial_y, float _intital_z) {
+    glDrawable load(InputStream _file, int[] _shader, int _mOffset, float _initial_x, float _initial_y, float _intital_z, String _tag) {
         Log.i(TAG, "load");
         ArrayList<Model> result = new ArrayList<Model>();
         Model model = new Model();
         boolean decided = false;
         String name = "Default name";
+        String tag = _tag;
         try {
             BufferedReader in = new BufferedReader(new InputStreamReader(_file));
             if (in.ready()) {
@@ -115,7 +116,7 @@ public class Interpreter {
             Log.e(TAG, e + ": Could not process file " + _file);
         }
         finally {
-            return makeDrawable(model, _shader, _mOffset, _initial_x, _initial_y, _intital_z, name);
+            return makeDrawable(model, _shader, _mOffset, _initial_x, _initial_y, _intital_z, name, tag);
         }
     }
 
@@ -128,7 +129,9 @@ public class Interpreter {
         return result;
     }
 
-    glDrawable makeDrawable(Model _base, int[] _shader, int _mOffset, float _initial_x, float _initial_y, float _initial_z, String _name) {
-        return new glDrawable(_base, _shader, _mOffset, _initial_x, _initial_y, _initial_z, _name);
+    glDrawable makeDrawable(Model _base, int[] _shader, int _mOffset, float _initial_x, float _initial_y, float _initial_z, String _name, String _tag) {
+        return new glDrawable(_base, _shader, _mOffset, _initial_x, _initial_y, _initial_z, _name, _tag) {
+            public void AnimationStep() {}
+        };
     }
 }
