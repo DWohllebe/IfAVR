@@ -79,7 +79,7 @@ public class glDrawable {
             COORDS_COUNT = _model.verticesTotal();
             COLORS = _model.colors();
             NORMALS =  _model.normals();
-            TEXELS = _model.texels();
+//            TEXELS = _model.texels();
         }
         catch(Exception e) {
             Log.e(TAG, e.getMessage());

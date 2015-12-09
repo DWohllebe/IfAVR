@@ -37,6 +37,8 @@ public class Interpreter {
         String tag = _tag;
         boolean object_name_defined_once = false;
         String material = "None";
+        int last_model_vertices_offset = 0;
+        int vertices_count = 0;
 
         try {
             BufferedReader in = new BufferedReader(new InputStreamReader(_file));
@@ -54,6 +56,7 @@ public class Interpreter {
                                 float z = Float.parseFloat(linetokens.get(3));
                                 model.addPositions(x, y, z);
                                 model.addColors(0.8359375f, 0.17578125f, 0.125f, 0.5f);
+                                vertices_count++;
                             }
                             if (linetokens.get(0).contentEquals("vt")) {
                                 float uv1 = Float.parseFloat(linetokens.get(1));
@@ -71,14 +74,14 @@ public class Interpreter {
 
                                 for (int i = 0; i < 3; i++) {
                                     String[] strings = linetokens.get(i + 1).split("/");
-                                    facevals[i * 3] = Integer.parseInt(strings[0]);
+                                    facevals[i * 3] = Integer.parseInt(strings[0]) /*- last_model_vertices_offset*/;
                                     try {
-                                        facevals[i * 3 + 1] = Integer.parseInt(strings[1]);
+                                        facevals[i * 3 + 1] = Integer.parseInt(strings[1]) /*- last_model_vertices_offset*/;
                                     } catch (NumberFormatException e) {
 //                                        Log.i(TAG, e.getMessage());
                                         facevals[i * 3 + 1] = 0;
                                     }
-                                    facevals[i * 3 + 2] = Integer.parseInt(strings[2]);
+                                    facevals[i * 3 + 2] = Integer.parseInt(strings[2]) /*- last_model_vertices_offset*/;
                                 }
                                 model.addFaces(facevals);
                             }
@@ -108,7 +111,10 @@ public class Interpreter {
                         if (linetokens.get(0).contentEquals("o")) {
                             if (object_name_defined_once) {
                                 result.add(makeDrawable(model, _shader, _mOffset, _initial_x, _initial_y, _intital_z, name, tag));
-                                model = new Model(); // start a new model
+                                model.clearFaces(); //delete Faces from current model
+                                //model = new Model(); // start a new model
+                                //model.setMode(Model.MODE.MESH);
+//                                last_model_vertices_offset = vertices_count;
                             }
                             name = linetokens.get(1);
                             object_name_defined_once = true;

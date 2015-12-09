@@ -161,6 +161,27 @@ public class Model {
         return normy;
     }
 
+    public void clear(DATATYPE _datatype) {
+        switch (_datatype) {
+            case NORMALS:
+                normals.clear();
+                break;
+            case VERTICES:
+                positions.clear();
+                break;
+            case TEXELS:
+                texels.clear();
+                break;
+            case COLORS:
+                colors.clear();
+                break;
+        }
+    }
+
+    public void clearFaces() {
+        faces.clear();
+    }
+
     int verticesTotal() {
         return nverticestotal;
     }

@@ -270,7 +270,7 @@ public class MainActivity extends CardboardActivity implements CardboardView.Ste
         int[] teapotshaders = {vertexShader, passthroughShader};
 //      glDrawable glTeapot = interpreter.load("res/gldrawable/teapot.obj", potshaders, 0, 0, 0, -objectDistance);
         drawableObjects.addAll( interpreter.load(
-                getResources().openRawResource(R.raw.alisabt),  // OBJ-Datei
+                getResources().openRawResource(R.raw.josie_rizal),  // OBJ-Datei
                 teapotshaders, // Shader
                 0, 0, -19.0f, objectDistance,   // Initiale Position
                 "Test Object") //Tag
