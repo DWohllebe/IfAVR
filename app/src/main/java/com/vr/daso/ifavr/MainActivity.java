@@ -133,8 +133,8 @@ public class MainActivity extends CardboardActivity implements CardboardView.Ste
     private float[] modelFloor;
 
     private int score = 0;
-    private float objectDistance = 12f;
-    private float floorDepth = 20f;
+    private float objectDistance = 5.0f;
+    private float floorDepth = 20.0f;
 
     private Vibrator vibrator;
     private CardboardOverlayView overlayView;
@@ -240,31 +240,6 @@ public class MainActivity extends CardboardActivity implements CardboardView.Ste
         Log.i(TAG, "onSurfaceCreated");
         GLES20.glClearColor(0.1f, 0.1f, 0.1f, 0.5f); // Dark background so text shows up well.
 
-//        ByteBuffer bbVertices = ByteBuffer.allocateDirect(WorldLayoutData.CUBE_COORDS.length * 4);
-//        bbVertices.order(ByteOrder.nativeOrder());
-//        cubeColors = bbVertices.asFloatBuffer();
-//        cubeVertices.put(WorldLayoutData.CUBE_COORDS);
-//        cubeVertices.position(0);
-
-//        ByteBuffer bbColors = ByteBuffer.allocateDirect(WorldLayoutData.CUBE_COLORS.length * 4);
-//        bbColors.order(ByteOrder.nativeOrder());
-//        cubeColors = bbColors.asFloatBuffer();
-//        cubeColors.put(WorldLayoutData.CUBE_COLORS);
-//        cubeColors.position(0);
-
-//        ByteBuffer bbFoundColors = ByteBuffer.allocateDirect(
-//                WorldLayoutData.CUBE_FOUND_COLORS.length * 4);
-//        bbFoundColors.order(ByteOrder.nativeOrder());
-//        cubeFoundColors = bbFoundColors.asFloatBuffer();
-//        cubeFoundColors.put(WorldLayoutData.CUBE_FOUND_COLORS);
-//        cubeFoundColors.position(0);
-
-//        ByteBuffer bbNormals = ByteBuffer.allocateDirect(WorldLayoutData.CUBE_NORMALS.length * 4);
-//        bbNormals.order(ByteOrder.nativeOrder());
-//        cubeNormals = bbNormals.asFloatBuffer();
-//        cubeNormals.put(WorldLayoutData.CUBE_NORMALS);
-//        cubeNormals.position(0);
-
         // make a floor
         ByteBuffer bbFloorVertices = ByteBuffer.allocateDirect(WorldLayoutData.FLOOR_COORDS.length * 4);
         bbFloorVertices.order(ByteOrder.nativeOrder());
@@ -294,25 +269,22 @@ public class MainActivity extends CardboardActivity implements CardboardView.Ste
         // Step 1: Create a drawable object from the OBJ-File
         int[] teapotshaders = {vertexShader, passthroughShader};
 //      glDrawable glTeapot = interpreter.load("res/gldrawable/teapot.obj", potshaders, 0, 0, 0, -objectDistance);
-        drawableObjects.add( interpreter.load(
+        drawableObjects.addAll( interpreter.load(
                 getResources().openRawResource(R.raw.alisabt),  // OBJ-Datei
                 teapotshaders, // Shader
                 0, 0, -19.0f, objectDistance,   // Initiale Position
                 "Test Object") //Tag
         );
-        drawableObjects.get( getGlObjectIndexByTag("Test Object") ).setAnimation(
-                new Animator() {
-                    public void AnimationStep(float[] _model) {
-                        Matrix.rotateM(_model,
-                                0,
-                                TIME_DELTA,
-                                0.0f,
-                                0.1f,
-                                0.0f);
-                    }
-                }
-        );
-
+        addAnimatorByTag("Test Object", new Animator() {
+            public void AnimationStep(float[] _model) {
+                Matrix.rotateM(_model,
+                        0,
+                        TIME_DELTA,
+                        0.0f,
+                        0.1f,
+                        0.0f);
+            }
+        });
 
 //        drawableObjects.add( interpreter.load(
 //                getResources().openRawResource(R.raw.cube),  // OBJ-Datei
@@ -754,7 +726,6 @@ public class MainActivity extends CardboardActivity implements CardboardView.Ste
 
     private int getGlObjectIndexByTag(String _name) {
         int loop = 0;
-        glDrawable candidate;
         Iterator<glDrawable> it = drawableObjects.iterator();
         while (it.hasNext()) {
             if ( it.next().getTag().matches(_name) ) {
@@ -763,6 +734,21 @@ public class MainActivity extends CardboardActivity implements CardboardView.Ste
             loop++;
         }
         return (-1);
+    }
+
+    /**
+     * Assigns an animator to all glDrawables that share the same tag (aka the same parent).
+     * @param _tag
+     */
+    private void addAnimatorByTag(String _tag, Animator _animator) {
+        glDrawable candidate;
+        Iterator<glDrawable> it = drawableObjects.iterator();
+        while (it.hasNext()) {
+            candidate = it.next();
+            if ( candidate.getTag().matches(_tag) ) {
+                candidate.setAnimation(_animator);
+            }
+        }
     }
 
 }
