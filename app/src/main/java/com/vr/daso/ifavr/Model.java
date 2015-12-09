@@ -154,7 +154,9 @@ public class Model {
                 for (int j = 0; j < rep; j++) { //then we write it to our array
                     normy[offs + j] = part[j];
                 }
-                nverticestotal++;
+                if (_datatype == DATATYPE.VERTICES) {
+                    nverticestotal++;
+                }
                 offs += rep;
             }
         }
@@ -184,6 +186,10 @@ public class Model {
 
     int verticesTotal() {
         return nverticestotal;
+    }
+
+    void clearVerticesTotal() {
+        nverticestotal = 0;
     }
 
     Object[] points() {

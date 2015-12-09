@@ -66,7 +66,6 @@ public class glDrawable {
 
     private Animator animator;
 
-
     glDrawable(Model _model, int[] _shader, int _mOffset, float _initial_x, float _initial_y, float _intital_z, String _name, String _tag) {
 //        switch (_model.getMode() ) {
 //            case MESH:
@@ -128,7 +127,7 @@ public class glDrawable {
             fbTexels.position(0);
         }
         else {
-           Log.e(TAG, "Texels are null");
+           Log.i(TAG, "Texels are null");
         }
 
 
@@ -322,6 +321,17 @@ public class glDrawable {
         else {
             Log.d(TAG + " " + objectTag, "No Animator defined");
         }
+    }
+
+    public void setColor(float _red, float _green, float _blue, float _alpha) {
+        for (int i = 0; i < COLORS.length; i += 4) {
+            COLORS[i] = _red;
+            COLORS[i+1] = _green;
+            COLORS[i+2] = _blue;
+            COLORS[i+3] = _alpha;
+        }
+        // rearrange the data
+        prepareFloatBuffer();
     }
 
     //    abstract public void onLookedAt();

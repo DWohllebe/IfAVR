@@ -214,7 +214,7 @@ public class MainActivity extends CardboardActivity implements CardboardView.Ste
  //               /*"http://141.30.154.211:8087/OPC/DA"*/"http://www.webservicex.net/country.asmx" );
 
         overlayView = (CardboardOverlayView) findViewById(R.id.overlay);
-        overlayView.show3DToast("Welcome!");
+        overlayView.show3DToast("Loading, please wait...");
     }
 
     @Override
@@ -270,12 +270,12 @@ public class MainActivity extends CardboardActivity implements CardboardView.Ste
         int[] teapotshaders = {vertexShader, passthroughShader};
 //      glDrawable glTeapot = interpreter.load("res/gldrawable/teapot.obj", potshaders, 0, 0, 0, -objectDistance);
         drawableObjects.addAll( interpreter.load(
-                getResources().openRawResource(R.raw.josie_rizal),  // OBJ-Datei
+                getResources().openRawResource(R.raw.forest),  // OBJ-Datei
                 teapotshaders, // Shader
                 0, 0, -19.0f, objectDistance,   // Initiale Position
                 "Test Object") //Tag
         );
-        addAnimatorByTag("Test Object", new Animator() {
+ /*       addAnimatorByTag("Test Object", new Animator() {
             public void AnimationStep(float[] _model) {
                 Matrix.rotateM(_model,
                         0,
@@ -284,7 +284,12 @@ public class MainActivity extends CardboardActivity implements CardboardView.Ste
                         0.1f,
                         0.0f);
             }
-        });
+        }); */
+
+        Iterator<glDrawable> it = drawableObjects.iterator();
+        while (it.hasNext()) {
+            it.next().setColor( (float) Math.random(),(float) Math.random(),(float) Math.random(), 0.5f );
+        }
 
 //        drawableObjects.add( interpreter.load(
 //                getResources().openRawResource(R.raw.cube),  // OBJ-Datei

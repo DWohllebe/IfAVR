@@ -112,6 +112,7 @@ public class Interpreter {
                             if (object_name_defined_once) {
                                 result.add(makeDrawable(model, _shader, _mOffset, _initial_x, _initial_y, _intital_z, name, tag));
                                 model.clearFaces(); //delete Faces from current model
+                                model.clearVerticesTotal();
                                 //model = new Model(); // start a new model
                                 //model.setMode(Model.MODE.MESH);
 //                                last_model_vertices_offset = vertices_count;
