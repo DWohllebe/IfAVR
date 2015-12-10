@@ -16,60 +16,60 @@ import java.nio.FloatBuffer;
  * Created by Daniel on 03.11.2015.
  */
 public class glDrawable {
-    private final String TAG = "glDrawableObject";
-    private String objectTag;
+    protected final String TAG = "glDrawableObject";
+    protected String objectTag;
 
-    private static final int COORDS_PER_VERTEX = 3;
+    protected static final int COORDS_PER_VERTEX = 3;
 
-    private float[] COORDS;
-    private float[] COLORS;
-    private float[] ACTIVE_COLORS;
-    private float[] NORMALS;
-    private float[] TEXELS;
+    protected float[] COORDS;
+    protected float[] COLORS;
+    protected float[] ACTIVE_COLORS;
+    protected float[] NORMALS;
+    protected float[] TEXELS;
 
-    private int COORDS_COUNT = 0;
+    protected int COORDS_COUNT = 0;
 
-    private int program;
-    private int positionParam;
-    private int normalParam;
-    private int colorParam;
-    private int modelParam;
-    private int modelViewParam;
-    private int modelViewProjectionParam;
-    private int lightPosParam;
-    private float[] BASE_MODEL = new float[16];
-    private float[] model = new float[16];
-    private float[] lightPosInEyeSpace;
+    protected int program;
+    protected int positionParam;
+    protected int normalParam;
+    protected int colorParam;
+    protected int modelParam;
+    protected int modelViewParam;
+    protected int modelViewProjectionParam;
+    protected int lightPosParam;
+    protected float[] BASE_MODEL = new float[16];
+    protected float[] model = new float[16];
+    protected float[] lightPosInEyeSpace;
 
-    private float[] modelViewProjection;
-    private float[] modelView;
+    protected float[] modelViewProjection;
+    protected float[] modelView;
 
-    private int texelParam;
-    private int texelCoordParam;
+    protected int texelParam;
+    protected int texelCoordParam;
 
-    private FloatBuffer fbVertices;
-    private FloatBuffer fbColors;
-    private FloatBuffer fbNormals;
-    private FloatBuffer fbTexels;
+    protected FloatBuffer fbVertices;
+    protected FloatBuffer fbColors;
+    protected FloatBuffer fbNormals;
+    protected FloatBuffer fbTexels;
 
-    private final String name;
+    protected final String name;
 
-    private boolean isInteractable = false; //this should be relegated to an interface
-    private boolean isPresent = true; // denotes wehter this object exists in the scene
-    private boolean isHidden = false; // denotes wether this object should be hidden
-    private boolean hasTexture = false;
+    protected boolean isInteractable = false; //this should be relegated to an interface
+    protected boolean isPresent = true; // denotes wehter this object exists in the scene
+    protected boolean isHidden = false; // denotes wether this object should be hidden
+    protected boolean hasTexture = false;
 
-    public float[] pose;
+    protected float[] pose;
 
-    private final int TEXTURE_COORDINATE_DATA_SIZE = 2;
-    private int textureDataHandle; // TODO: refactor
+    protected final int TEXTURE_COORDINATE_DATA_SIZE = 2;
+    protected int textureDataHandle; // TODO: refactor
 
-    private Animator animator;
+    protected Animator animator;
 
-    glDrawable(Model _model, int[] _shader, int _mOffset, float _initial_x, float _initial_y, float _intital_z, String _name, String _tag) {
+    glDrawable(Model _model, int[] _shader, int _mOffset, float _initial_x, float _initial_y, float _intital_z, String _tag) {
 //        switch (_model.getMode() ) {
 //            case MESH:
-        name = _name;
+        name = _model.getName();
         objectTag = _tag;
         modelViewProjection = new float[16];
         modelView = new float[16];
@@ -78,7 +78,10 @@ public class glDrawable {
             COORDS_COUNT = _model.verticesTotal();
             COLORS = _model.colors();
             NORMALS =  _model.normals();
-//            TEXELS = _model.texels();
+            try {
+                TEXELS = _model.texels();
+            }
+            catch (IndexOutOfBoundsException e) {}
         }
         catch(Exception e) {
             Log.e(TAG, e.getMessage());
@@ -162,7 +165,7 @@ public class glDrawable {
         checkGLError(TAG + " " + name + ": Create Program");
     }
 
-    private void createParameters() {
+    protected void createParameters() {
         positionParam = GLES20.glGetAttribLocation(program, "a_Position");
         normalParam = GLES20.glGetAttribLocation(program, "a_Normal");
         colorParam = GLES20.glGetAttribLocation(program, "a_Color");
@@ -189,9 +192,10 @@ public class glDrawable {
      * @param _perspective
      * @param _lightPosInEyeSpace
      */
-    public void draw(float[] _view, float[] _perspective, float[] _lightPosInEyeSpace) {
+    public void draw(float[] _view, float[] _perspective, float[] _lightPosInEyeSpace, int _eyetype) {
         createParameters();
         if (hasTexture) {
+            GLES20.glEnable(GLES20.GL_TEXTURE_2D);
             texelParam = GLES20.glGetUniformLocation(program, "u_Texture");
             texelCoordParam = GLES20.glGetAttribLocation(program, "a_TexCoordinate");
         }
@@ -237,7 +241,7 @@ public class glDrawable {
      *
      * @param label Label to report in case of error.
      */
-    private void checkGLError(String label) {
+    protected void checkGLError(String label) {
         int error;
         while ((error = GLES20.glGetError()) != GLES20.GL_NO_ERROR) {
             Log.e(TAG, label + ": glError " + error);

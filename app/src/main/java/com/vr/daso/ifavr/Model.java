@@ -7,7 +7,7 @@ import java.util.ArrayList;
 /**
  * Created by Daniel on 03.11.2015.
  */
-public class Model {
+public class Model implements Cloneable {
     private int nvertices = 0;
     private int npositions = 0;
     private int ntexels = 0;
@@ -15,6 +15,8 @@ public class Model {
     private int nfaces = 0;
     private int npoints = 0;
     private int ncolors = 0;
+
+    private String name = "Default";
 
     private int nverticestotal = 0;
 
@@ -39,6 +41,19 @@ public class Model {
 
     Model() {
      mode = Model.MODE.UNDECIDED;
+    }
+
+    @Override
+    protected Model clone() throws CloneNotSupportedException {
+        Model result = (Model) super.clone();
+        result.positions = (ArrayList<float[]>) positions.clone();
+        result.texels = (ArrayList<float[]>) texels.clone();
+        result.normals = (ArrayList<float[]>) normals.clone();
+        result.faces = (ArrayList<int[]>) faces.clone();
+        result.points = (ArrayList<float[]>) points.clone();
+        result.colors = (ArrayList<float[]>) colors.clone();
+
+        return result;
     }
 
     float[] positions() {
@@ -212,5 +227,13 @@ public class Model {
         else {
             Log.e(TAG, "finalize() already called before");
         }
+    }
+
+    public void setName(String _name) {
+        name = _name;
+    }
+
+    public String getName() {
+        return name;
     }
 }

@@ -1,12 +1,10 @@
 package com.vr.daso.ifavr;
 
-import android.annotation.SuppressLint;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.BitmapShader;
 import android.os.AsyncTask;
-import android.support.v7.app.ActionBar;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.os.Handler;
-import android.view.MotionEvent;
 import android.view.View;
 
 // VRToolKit
@@ -19,13 +17,10 @@ import com.google.vrtoolkit.cardboard.Viewport;
 import android.content.Context;
 import android.opengl.GLES20;
 import android.opengl.Matrix;
-import android.os.Bundle;
 import android.os.Vibrator;
 import android.util.Log;
-import android.widget.TextView;
 
 import org.ksoap2.SoapEnvelope;
-import org.ksoap2.serialization.PropertyInfo;
 import org.ksoap2.serialization.SoapObject;
 import org.ksoap2.serialization.SoapPrimitive;
 import org.ksoap2.serialization.SoapSerializationEnvelope;
@@ -265,17 +260,21 @@ public class MainActivity extends CardboardActivity implements CardboardView.Ste
         int gridShader = loadGLShader(GLES20.GL_FRAGMENT_SHADER, R.raw.grid_fragment);
         int passthroughShader = loadGLShader(GLES20.GL_FRAGMENT_SHADER, R.raw.passthrough_fragment);
 
+        int texturedVertexShader = loadGLShader(GLES20.GL_VERTEX_SHADER, R.raw.textured_light_vertex);
+        int texturedFragmentShader = loadGLShader(GLES20.GL_FRAGMENT_SHADER, R.raw.textured_fragment);
+
         // *** First implementation trying to implement a Barkley teapot ***
         // Step 1: Create a drawable object from the OBJ-File
         int[] teapotshaders = {vertexShader, passthroughShader};
+        int[] textureshaders = {texturedVertexShader, texturedFragmentShader};
 //      glDrawable glTeapot = interpreter.load("res/gldrawable/teapot.obj", potshaders, 0, 0, 0, -objectDistance);
-        drawableObjects.addAll( interpreter.load(
-                getResources().openRawResource(R.raw.forest),  // OBJ-Datei
+        drawableObjects.addAll(interpreter.load(
+                getResources().openRawResource(R.raw.alisabt),  // OBJ-Datei
                 teapotshaders, // Shader
                 0, 0, -19.0f, objectDistance,   // Initiale Position
                 "Test Object") //Tag
         );
- /*       addAnimatorByTag("Test Object", new Animator() {
+        addAnimatorByTag("Test Object", new Animator() {
             public void AnimationStep(float[] _model) {
                 Matrix.rotateM(_model,
                         0,
@@ -284,7 +283,25 @@ public class MainActivity extends CardboardActivity implements CardboardView.Ste
                         0.1f,
                         0.0f);
             }
-        }); */
+        });
+
+        drawableObjects.add(interpreter.loadSBSImage(
+                getResources().openRawResource(R.raw.testimage),
+                getResources().openRawResource(R.raw.plane),
+                textureshaders, // Shader
+                0, 0, -19.0f, objectDistance - 3.0f,   // Initiale Position
+                "SBS Image") //Tag
+        );
+        addAnimatorByTag("SBS Image", new Animator() {
+            public void AnimationStep(float[] _model) {
+                Matrix.rotateM(_model,
+                        0,
+                        TIME_DELTA,
+                        0.0f,
+                        0.1f,
+                        0.0f);
+            }
+        });
 
         Iterator<glDrawable> it = drawableObjects.iterator();
         while (it.hasNext()) {
@@ -458,7 +475,7 @@ public class MainActivity extends CardboardActivity implements CardboardView.Ste
 
         Iterator<glDrawable> it = drawableObjects.iterator();
         while (it.hasNext()) {
-            it.next().draw(view, perspective, lightPosInEyeSpace);
+            it.next().draw(view, perspective, lightPosInEyeSpace, eye.getType() );
         }
     }
 
