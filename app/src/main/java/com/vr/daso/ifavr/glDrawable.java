@@ -167,19 +167,29 @@ public class glDrawable {
 
     protected void createParameters() {
         positionParam = GLES20.glGetAttribLocation(program, "a_Position");
+        checkGLError(TAG + " " + name + ": Create Parameters / a_Position");
         normalParam = GLES20.glGetAttribLocation(program, "a_Normal");
+        checkGLError(TAG + " " + name + ": Create Parameters / a_Normal");
         colorParam = GLES20.glGetAttribLocation(program, "a_Color");
+        checkGLError(TAG + " " + name + ": Create Parameters /a_Color");
 
         modelParam = GLES20.glGetUniformLocation(program, "u_Model");
+        checkGLError(TAG + " " + name + ": Create Parameters / u_Model");
         modelViewParam = GLES20.glGetUniformLocation(program, "u_MVMatrix");
+        checkGLError(TAG + " " + name + ": Create Parameters /u_MVMatrix");
         modelViewProjectionParam = GLES20.glGetUniformLocation(program, "u_MVP");
+        checkGLError(TAG + " " + name + ": Create Parameters / u_MVP");
         lightPosParam = GLES20.glGetUniformLocation(program, "u_LightPos");
+        checkGLError(TAG + " " + name + ": Create Parameters / u_LightPos");
 
         GLES20.glEnableVertexAttribArray(positionParam);
+        checkGLError(TAG + " " + name + ": Create Parameters / positionParam");
         GLES20.glEnableVertexAttribArray(normalParam);
+        checkGLError(TAG + " " + name + ": Create Parameters / normalParam");
         GLES20.glEnableVertexAttribArray(colorParam);
+        checkGLError(TAG + " " + name + ": Create Parameters / colorParam");
 
-        checkGLError(TAG + " " + name + ": Create Parameters");
+//        checkGLError(TAG + " " + name + ": Create Parameters");
     }
 
     private void translate(float[] _matrix, int _mOffset, float _x, float _y, float _z){

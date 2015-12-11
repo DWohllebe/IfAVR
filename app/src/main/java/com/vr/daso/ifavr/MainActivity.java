@@ -67,7 +67,7 @@ public class MainActivity extends CardboardActivity implements CardboardView.Ste
     private static final float Z_FAR = 100.0f;
 
     private static float CAMERA_Z = /*0.01f*/ -5.40f;
-    private static float CAMERA_Y = -18.0f;
+    private static float CAMERA_Y = /*-18.0f*/0.0f;
     private static float CAMERA_X = 0.0f;
     private static final float TIME_DELTA = 1.0f;
 
@@ -260,8 +260,8 @@ public class MainActivity extends CardboardActivity implements CardboardView.Ste
         int gridShader = loadGLShader(GLES20.GL_FRAGMENT_SHADER, R.raw.grid_fragment);
         int passthroughShader = loadGLShader(GLES20.GL_FRAGMENT_SHADER, R.raw.passthrough_fragment);
 
-        int texturedVertexShader = loadGLShader(GLES20.GL_VERTEX_SHADER, R.raw.textured_light_vertex);
-        int texturedFragmentShader = loadGLShader(GLES20.GL_FRAGMENT_SHADER, R.raw.textured_fragment);
+        int texturedVertexShader = loadGLShader(GLES20.GL_VERTEX_SHADER, R.raw.simple_texture_vertex);
+        int texturedFragmentShader = loadGLShader(GLES20.GL_FRAGMENT_SHADER, R.raw.simple_fragment_shader);
 
         // *** First implementation trying to implement a Barkley teapot ***
         // Step 1: Create a drawable object from the OBJ-File
@@ -271,7 +271,7 @@ public class MainActivity extends CardboardActivity implements CardboardView.Ste
         drawableObjects.addAll(interpreter.load(
                 getResources().openRawResource(R.raw.alisabt),  // OBJ-Datei
                 teapotshaders, // Shader
-                0, 0, -19.0f, objectDistance,   // Initiale Position
+                0, 0, /*-19.0f*/ -2.0f, objectDistance,   // Initiale Position
                 "Test Object") //Tag
         );
         addAnimatorByTag("Test Object", new Animator() {
@@ -286,10 +286,10 @@ public class MainActivity extends CardboardActivity implements CardboardView.Ste
         });
 
         drawableObjects.add(interpreter.loadSBSImage(
-                getResources().openRawResource(R.raw.testimage),
+                getResources().openRawResource(R.raw.testimage2),
                 getResources().openRawResource(R.raw.plane),
                 textureshaders, // Shader
-                0, 0, -19.0f, objectDistance - 3.0f,   // Initiale Position
+                0, 0, /*-19.0f*/ -2.0f, objectDistance - 3.0f,   // Initiale Position
                 "SBS Image") //Tag
         );
         addAnimatorByTag("SBS Image", new Animator() {

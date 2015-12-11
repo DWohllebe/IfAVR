@@ -28,31 +28,35 @@ public class sbsDrawable extends glDrawable {
         // Bind to the texture in OpenGL
         GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, textureHandle[0]);
         // Scale up if the texture if smaller.
-        GLES20.glTexParameterf(GLES20.GL_TEXTURE_2D,
+        GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D,
                 GLES20.GL_TEXTURE_MAG_FILTER,
                 GLES20.GL_LINEAR);
 
         // scale linearly when image smaller than texture
-        GLES20.glTexParameterf(GLES20.GL_TEXTURE_2D,
+        GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D,
                 GLES20.GL_TEXTURE_MIN_FILTER,
                 GLES20.GL_LINEAR);
+
+        GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_WRAP_S, GLES20.GL_CLAMP_TO_EDGE);
+        GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_WRAP_T, GLES20.GL_CLAMP_TO_EDGE);
+
         GLUtils.texImage2D(GLES20.GL_TEXTURE_2D, 0, leftImage, 0);
 
         GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, textureHandle[1]);
         // Scale up if the texture if smaller.
-        GLES20.glTexParameterf(GLES20.GL_TEXTURE_2D,
-                GLES20.GL_TEXTURE_MAG_FILTER,
-                GLES20.GL_LINEAR);
+//        GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D,
+//                GLES20.GL_TEXTURE_MAG_FILTER,
+//                GLES20.GL_LINEAR);
 
         // scale linearly when image smaller than texture
-        GLES20.glTexParameterf(GLES20.GL_TEXTURE_2D,
-                GLES20.GL_TEXTURE_MIN_FILTER,
-                GLES20.GL_LINEAR);
+//       GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D,
+//                GLES20.GL_TEXTURE_MIN_FILTER,
+//                GLES20.GL_LINEAR);
         GLUtils.texImage2D(GLES20.GL_TEXTURE_2D, 0, rightImage, 0);
 
         // Set filtering
- //       GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_MIN_FILTER, GLES20.GL_NEAREST);
- //       GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_MAG_FILTER, GLES20.GL_NEAREST);
+//        GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_MIN_FILTER, GLES20.GL_NEAREST);
+//        GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_MAG_FILTER, GLES20.GL_NEAREST);
 
         // Load the bitmap into the bound texture
 
@@ -69,6 +73,9 @@ public class sbsDrawable extends glDrawable {
         {
             throw new RuntimeException("Error loading texture 2");
         }
+
+        leftImage.recycle();
+        rightImage.recycle();
 
         super.hasTexture = true;
     }
@@ -108,8 +115,8 @@ public class sbsDrawable extends glDrawable {
         GLES20.glVertexAttribPointer(normalParam, 3, GLES20.GL_FLOAT, false, 0,
                 fbNormals);
         checkGLError(TAG + " " + objectTag + ": Normal Parameters");
-        GLES20.glVertexAttribPointer(colorParam, 4, GLES20.GL_FLOAT, false, 0, fbColors);
-        checkGLError(TAG + " " + objectTag + ": Color Parameters");
+//        GLES20.glVertexAttribPointer(colorParam, 4, GLES20.GL_FLOAT, false, 0, fbColors);
+//        checkGLError(TAG + " " + objectTag + ": Color Parameters");
 
         if ( hasTexture ) {
             GLES20.glVertexAttribPointer(texelParam, 2, GLES20.GL_FLOAT, false, 0, fbTexels);
@@ -153,5 +160,33 @@ public class sbsDrawable extends glDrawable {
 //        GLES20.glDisable(GLES20.GL_TEXTURE_2D);
 
         checkGLError(TAG + " " + objectTag + ": Draw");
+    }
+
+    @Override
+    protected void createParameters() {
+        positionParam = GLES20.glGetAttribLocation(program, "a_Position");
+        checkGLError(TAG + " " + name + ": Create Parameters / a_Position");
+        normalParam = GLES20.glGetAttribLocation(program, "a_Normal");
+        checkGLError(TAG + " " + name + ": Create Parameters / a_Normal");
+//        colorParam = GLES20.glGetAttribLocation(program, "a_Color");
+//        checkGLError(TAG + " " + name + ": Create Parameters /a_Color");
+
+        modelParam = GLES20.glGetUniformLocation(program, "u_Model");
+        checkGLError(TAG + " " + name + ": Create Parameters / u_Model");
+        modelViewParam = GLES20.glGetUniformLocation(program, "u_MVMatrix");
+        checkGLError(TAG + " " + name + ": Create Parameters /u_MVMatrix");
+        modelViewProjectionParam = GLES20.glGetUniformLocation(program, "u_MVP");
+        checkGLError(TAG + " " + name + ": Create Parameters / u_MVP");
+        lightPosParam = GLES20.glGetUniformLocation(program, "u_LightPos");
+        checkGLError(TAG + " " + name + ": Create Parameters / u_LightPos");
+
+        GLES20.glEnableVertexAttribArray(positionParam);
+        checkGLError(TAG + " " + name + ": Create Parameters / positionParam");
+        GLES20.glEnableVertexAttribArray(normalParam);
+        checkGLError(TAG + " " + name + ": Create Parameters / normalParam");
+//        GLES20.glEnableVertexAttribArray(colorParam);
+//        checkGLError(TAG + " " + name + ": Create Parameters / colorParam");
+
+//        checkGLError(TAG + " " + name + ": Create Parameters");
     }
 }

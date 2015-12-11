@@ -181,8 +181,8 @@ public class Interpreter {
         Bitmap leftImage = Bitmap.createBitmap(image, 0, 0, image.getWidth()/2 , image.getHeight());
         Bitmap rightImage = Bitmap.createBitmap(image, image.getWidth() / 2, 0, image.getWidth() / 2, image.getHeight());
 
-        leftImage = Bitmap.createScaledBitmap(leftImage, 512, 512, false);
-        rightImage = Bitmap.createScaledBitmap(rightImage, 512, 512, false);
+        leftImage = Bitmap.createScaledBitmap(leftImage, 256, 256, false);
+        rightImage = Bitmap.createScaledBitmap(rightImage, 256, 256, false);
 
         // create a canvas on which we will stick the images
         ArrayList<Model> models = loadModels(_canvas);
