@@ -103,7 +103,7 @@ public class glDrawable {
         translate(BASE_MODEL, _mOffset, _initial_x, _initial_y, _intital_z);
     }
 
-    private void prepareFloatBuffer() {
+    protected void prepareFloatBuffer() {
         ByteBuffer bbVertices = ByteBuffer.allocateDirect(COORDS.length * 4);
         bbVertices.order(ByteOrder.nativeOrder());
         fbVertices = bbVertices.asFloatBuffer();

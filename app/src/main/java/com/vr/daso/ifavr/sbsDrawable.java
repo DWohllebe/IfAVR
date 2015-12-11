@@ -20,6 +20,7 @@ public class sbsDrawable extends glDrawable {
         super(_model, _shader, _mOffset, _initial_x, _initial_y, _intital_z, _tag);
         leftImage = _leftImage;
         rightImage = _rightImage;
+        hasTexture = true;
 
         // create a unique identifier for the texture
         final int[] textureHandle = new int[2];
@@ -63,7 +64,7 @@ public class sbsDrawable extends glDrawable {
         textureDataHandleLeft =  textureHandle[0];
         textureDataHandleRight = textureHandle[1];
 
-        GLES20.glEnableVertexAttribArray(super.texelParam);
+        GLES20.glEnableVertexAttribArray(texelParam);
 
         if (textureHandle[0] == 0)
         {
@@ -76,8 +77,6 @@ public class sbsDrawable extends glDrawable {
 
         leftImage.recycle();
         rightImage.recycle();
-
-        super.hasTexture = true;
     }
 
     /**
@@ -91,7 +90,6 @@ public class sbsDrawable extends glDrawable {
     public void draw(float[] _view, float[] _perspective, float[] _lightPosInEyeSpace, int _eyetype) {
         createParameters();
         if (hasTexture) {
-//            GLES20.glEnable(GLES20.GL_TEXTURE_2D);
             texelParam = GLES20.glGetUniformLocation(program, "u_Texture");
             texelCoordParam = GLES20.glGetAttribLocation(program, "a_TexCoordinate");
         }
@@ -189,4 +187,6 @@ public class sbsDrawable extends glDrawable {
 
 //        checkGLError(TAG + " " + name + ": Create Parameters");
     }
+
+
 }

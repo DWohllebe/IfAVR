@@ -269,9 +269,9 @@ public class MainActivity extends CardboardActivity implements CardboardView.Ste
         int[] textureshaders = {texturedVertexShader, texturedFragmentShader};
 //      glDrawable glTeapot = interpreter.load("res/gldrawable/teapot.obj", potshaders, 0, 0, 0, -objectDistance);
         drawableObjects.addAll(interpreter.load(
-                getResources().openRawResource(R.raw.alisabt),  // OBJ-Datei
+                getResources().openRawResource(R.raw.josie_rizal),  // OBJ-Datei
                 teapotshaders, // Shader
-                0, 0, /*-19.0f*/ -2.0f, objectDistance,   // Initiale Position
+                0, 0, /*-19.0f*/ -1.0f, objectDistance,   // Initiale Position
                 "Test Object") //Tag
         );
         addAnimatorByTag("Test Object", new Animator() {
@@ -286,10 +286,10 @@ public class MainActivity extends CardboardActivity implements CardboardView.Ste
         });
 
         drawableObjects.add(interpreter.loadSBSImage(
-                getResources().openRawResource(R.raw.testimage2),
+                getResources().openRawResource(R.raw.crate_texture),
                 getResources().openRawResource(R.raw.plane),
                 textureshaders, // Shader
-                0, 0, /*-19.0f*/ -2.0f, objectDistance - 3.0f,   // Initiale Position
+                0, 0, /*-19.0f*/ -1.0f, objectDistance - 3.0f,   // Initiale Position
                 "SBS Image") //Tag
         );
         addAnimatorByTag("SBS Image", new Animator() {
@@ -297,9 +297,10 @@ public class MainActivity extends CardboardActivity implements CardboardView.Ste
                 Matrix.rotateM(_model,
                         0,
                         TIME_DELTA,
-                        0.0f,
                         0.1f,
-                        0.0f);
+                        0.1f,
+                        0.1f);
+                Matrix.translateM(_model, 0, 0.0001f, 0.0001f, 0.0001f);
             }
         });
 

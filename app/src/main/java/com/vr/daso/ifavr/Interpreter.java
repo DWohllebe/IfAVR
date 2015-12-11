@@ -176,13 +176,16 @@ public class Interpreter {
     }
 
     sbsDrawable loadSBSImage(InputStream _file, InputStream _canvas, int[] _shader, int _mOffset, float _initial_x, float _initial_y, float _initial_z, String _tag) { // TODO: WIP
-        Bitmap image = BitmapFactory.decodeStream(_file);
+        final BitmapFactory.Options options = new BitmapFactory.Options();
+        options.inScaled = false;
+
+        Bitmap image = BitmapFactory.decodeStream(_file, null, options);
 
         Bitmap leftImage = Bitmap.createBitmap(image, 0, 0, image.getWidth()/2 , image.getHeight());
         Bitmap rightImage = Bitmap.createBitmap(image, image.getWidth() / 2, 0, image.getWidth() / 2, image.getHeight());
 
-        leftImage = Bitmap.createScaledBitmap(leftImage, 256, 256, false);
-        rightImage = Bitmap.createScaledBitmap(rightImage, 256, 256, false);
+        leftImage = Bitmap.createScaledBitmap(leftImage, 1024, 1024, false);
+        rightImage = Bitmap.createScaledBitmap(rightImage, 1024, 1024, false);
 
         // create a canvas on which we will stick the images
         ArrayList<Model> models = loadModels(_canvas);
