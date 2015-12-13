@@ -172,6 +172,7 @@ public class glDrawable {
         checkGLError(TAG + " " + name + ": Create Parameters / a_Normal");
         colorParam = GLES20.glGetAttribLocation(program, "a_Color");
         checkGLError(TAG + " " + name + ": Create Parameters /a_Color");
+//        texelParam = GLES20.glGetAttribLocation(program, "a_TexCoordinate"); // TODO: delete?
 
         modelParam = GLES20.glGetUniformLocation(program, "u_Model");
         checkGLError(TAG + " " + name + ": Create Parameters / u_Model");
@@ -205,7 +206,6 @@ public class glDrawable {
     public void draw(float[] _view, float[] _perspective, float[] _lightPosInEyeSpace, int _eyetype) {
         createParameters();
         if (hasTexture) {
-            GLES20.glEnable(GLES20.GL_TEXTURE_2D);
             texelParam = GLES20.glGetUniformLocation(program, "u_Texture");
             texelCoordParam = GLES20.glGetAttribLocation(program, "a_TexCoordinate");
         }
@@ -242,6 +242,10 @@ public class glDrawable {
         }
 
         GLES20.glDrawArrays(GLES20.GL_TRIANGLES, 0, COORDS_COUNT);
+
+//        GLES20.glDisableVertexAttribArray(colorParam);
+//        GLES20.glDisableVertexAttribArray(normalParam);
+//        GLES20.glDisableVertexAttribArray(positionParam);
 
         checkGLError(TAG + " " + name + ": Draw");
     }

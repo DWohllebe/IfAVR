@@ -285,6 +285,29 @@ public class MainActivity extends CardboardActivity implements CardboardView.Ste
             }
         });
 
+        Iterator<glDrawable> it = drawableObjects.iterator();
+        while (it.hasNext()) {
+            it.next().setColor( (float) Math.random(),(float) Math.random(),(float) Math.random(), 0.5f );
+        }
+
+//        drawableObjects.addAll(interpreter.load(
+//                getResources().openRawResource(R.raw.plane),  // OBJ-Datei
+//                textureshaders, // Shader
+//                0, 0, /*-19.0f*/ 1.0f, objectDistance,   // Initiale Position
+//                "Plane") //Tag
+//        );
+//        addAnimatorByTag("Plane", new Animator() {
+//            public void AnimationStep(float[] _model) {
+//                Matrix.rotateM(_model,
+//                        0,
+//                        TIME_DELTA,
+//                        0.0f,
+//                        0.1f,
+//                        0.0f);
+//            }
+//        });
+//        drawableObjects.get(getGlObjectIndexByTag("Plane")).loadTexture(this, R.raw.crate_texture);
+
         drawableObjects.add(interpreter.loadSBSImage(
                 getResources().openRawResource(R.raw.crate_texture),
                 getResources().openRawResource(R.raw.plane),
@@ -304,10 +327,7 @@ public class MainActivity extends CardboardActivity implements CardboardView.Ste
             }
         });
 
-        Iterator<glDrawable> it = drawableObjects.iterator();
-        while (it.hasNext()) {
-            it.next().setColor( (float) Math.random(),(float) Math.random(),(float) Math.random(), 0.5f );
-        }
+
 
 //        drawableObjects.add( interpreter.load(
 //                getResources().openRawResource(R.raw.cube),  // OBJ-Datei

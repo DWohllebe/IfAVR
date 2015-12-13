@@ -64,7 +64,6 @@ public class sbsDrawable extends glDrawable {
         textureDataHandleLeft =  textureHandle[0];
         textureDataHandleRight = textureHandle[1];
 
-        GLES20.glEnableVertexAttribArray(texelParam);
 
         if (textureHandle[0] == 0)
         {
@@ -89,24 +88,35 @@ public class sbsDrawable extends glDrawable {
     @Override
     public void draw(float[] _view, float[] _perspective, float[] _lightPosInEyeSpace, int _eyetype) {
         createParameters();
+        checkGLError(TAG + " " + objectTag + ": Create Parameters");
         if (hasTexture) {
-            texelParam = GLES20.glGetUniformLocation(program, "u_Texture");
             texelCoordParam = GLES20.glGetAttribLocation(program, "a_TexCoordinate");
+            checkGLError(TAG + " " + objectTag + ": Get Tex Coordinates");
+//            texelParam = GLES20.glGetUniformLocation(program, "u_Texture");
+            checkGLError(TAG + " " + objectTag + ": Get Texture Sampler Uniform Location");
+//            GLES20.glEnableVertexAttribArray(texelParam);
+            checkGLError(TAG + " " + objectTag + ": Enable texelParam");
         }
 
         Matrix.multiplyMM(modelView, 0, _view, 0, model, 0);
+        checkGLError(TAG + " " + objectTag + ": Multiply to Model View");
         Matrix.multiplyMM(modelViewProjection, 0, _perspective, 0,
                 modelView, 0);
+        checkGLError(TAG + " " + objectTag + ": Multiply to Model View Projection");
 
         GLES20.glUseProgram(program);
+        checkGLError(TAG + " " + objectTag + ": Create Program");
 
         // Set ModelView, MVP, position, normals, and color.
         GLES20.glUniform3fv(lightPosParam, 1, _lightPosInEyeSpace, 0);
+        checkGLError(TAG + " " + objectTag + ": lightPosInEyeSpace");
         GLES20.glUniformMatrix4fv(modelParam, 1, false, model, 0);
+        checkGLError(TAG + " " + objectTag + ": Model Parameters");
         GLES20.glUniformMatrix4fv(modelViewParam, 1, false, modelView, 0);
+        checkGLError(TAG + " " + objectTag + ": Model View Parameter");
         GLES20.glUniformMatrix4fv(modelViewProjectionParam, 1, false,
                 modelViewProjection, 0);
-        checkGLError(TAG + " " + objectTag + ": Uniform Matrizes");
+        checkGLError(TAG + " " + objectTag + ": Model View Projection Parameter");
         GLES20.glVertexAttribPointer(positionParam, COORDS_PER_VERTEX, GLES20.GL_FLOAT,
                 false, 0, fbVertices);
         checkGLError(TAG + " " + objectTag + ": Vertex Parameters");
@@ -117,7 +127,7 @@ public class sbsDrawable extends glDrawable {
 //        checkGLError(TAG + " " + objectTag + ": Color Parameters");
 
         if ( hasTexture ) {
-            GLES20.glVertexAttribPointer(texelParam, 2, GLES20.GL_FLOAT, false, 0, fbTexels);
+            GLES20.glVertexAttribPointer(texelCoordParam, 2, GLES20.GL_FLOAT, false, 0, fbTexels);
 
             switch (_eyetype) {
                 case (Eye.Type.LEFT):
@@ -130,7 +140,7 @@ public class sbsDrawable extends glDrawable {
                     checkGLError(TAG + " " + objectTag + ": bindTexture");
 
                     // Tell the texture uniform smapler to use this texture in the shader by binding to texture unit 0
-                    GLES20.glUniform1i(texelParam, 0);
+//                    GLES20.glUniform1i(texelParam, 0);
                     checkGLError(TAG + " " + objectTag + ": Uniform");
 
                     break;
@@ -143,7 +153,7 @@ public class sbsDrawable extends glDrawable {
                     GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, textureDataHandleRight);
 
                     // Tell the texture uniform smapler to use this texture in the shader by binding to texture unit 1
-                    GLES20.glUniform1i(texelParam, 1);
+//                    GLES20.glUniform1i(texelParam, 1);
 
                     break;
 
@@ -156,6 +166,10 @@ public class sbsDrawable extends glDrawable {
 
         GLES20.glDrawArrays(GLES20.GL_TRIANGLES, 0, COORDS_COUNT);
 //        GLES20.glDisable(GLES20.GL_TEXTURE_2D);
+//        GLES20.glDisableVertexAttribArray(colorParam);
+//        GLES20.glDisableVertexAttribArray(normalParam);
+//        GLES20.glDisableVertexAttribArray(positionParam);
+//        GLES20.glDisableVertexAttribArray(texelParam);
 
         checkGLError(TAG + " " + objectTag + ": Draw");
     }
@@ -166,8 +180,8 @@ public class sbsDrawable extends glDrawable {
         checkGLError(TAG + " " + name + ": Create Parameters / a_Position");
         normalParam = GLES20.glGetAttribLocation(program, "a_Normal");
         checkGLError(TAG + " " + name + ": Create Parameters / a_Normal");
-//        colorParam = GLES20.glGetAttribLocation(program, "a_Color");
-//        checkGLError(TAG + " " + name + ": Create Parameters /a_Color");
+        colorParam = GLES20.glGetAttribLocation(program, "a_Color");
+        checkGLError(TAG + " " + name + ": Create Parameters /a_Color");
 
         modelParam = GLES20.glGetUniformLocation(program, "u_Model");
         checkGLError(TAG + " " + name + ": Create Parameters / u_Model");
@@ -182,8 +196,8 @@ public class sbsDrawable extends glDrawable {
         checkGLError(TAG + " " + name + ": Create Parameters / positionParam");
         GLES20.glEnableVertexAttribArray(normalParam);
         checkGLError(TAG + " " + name + ": Create Parameters / normalParam");
-//        GLES20.glEnableVertexAttribArray(colorParam);
-//        checkGLError(TAG + " " + name + ": Create Parameters / colorParam");
+        GLES20.glEnableVertexAttribArray(colorParam);
+        checkGLError(TAG + " " + name + ": Create Parameters / colorParam");
 
 //        checkGLError(TAG + " " + name + ": Create Parameters");
     }
