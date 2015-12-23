@@ -134,7 +134,11 @@ public class MainActivity extends CardboardActivity implements CardboardView.Ste
     private Vibrator vibrator;
     private CardboardOverlayView overlayView;
 
+    private Pumpstation pumpStation;
     private Category pumpInformation;
+
+    private float CONTAINER_RELATIVE_OFFSET = 2.5f;
+    private float CONTAINER_POSITION_DISTANCE = 4.0f;
 
     /**
      * Converts a raw text file, saved as a resource, into an OpenGL ES shader.
@@ -266,15 +270,16 @@ public class MainActivity extends CardboardActivity implements CardboardView.Ste
         // *** First implementation trying to implement a Barkley teapot ***
         // Step 1: Create a drawable object from the OBJ-File
         int[] teapotshaders = {vertexShader, passthroughShader};
+        int[] plainshader = {vertexShader, passthroughShader};
         int[] textureshaders = {texturedVertexShader, texturedFragmentShader};
 //      glDrawable glTeapot = interpreter.load("res/gldrawable/teapot.obj", potshaders, 0, 0, 0, -objectDistance);
         drawableObjects.addAll(interpreter.load(
                 getResources().openRawResource(R.raw.josie_rizal),  // OBJ-Datei
                 teapotshaders, // Shader
-                0, 0, /*-19.0f*/ -1.0f, objectDistance,   // Initiale Position
+                0, 0, /*-19.0f*/ -1.0f, -2*objectDistance,   // Initiale Position
                 "Test Object") //Tag
         );
-        addAnimatorByTag("Test Object", new Animator() {
+        addAppendixByTag("Test Object", new Animator() {
             public void AnimationStep(float[] _model) {
                 Matrix.rotateM(_model,
                         0,
@@ -289,6 +294,62 @@ public class MainActivity extends CardboardActivity implements CardboardView.Ste
         while (it.hasNext()) {
             it.next().setColor( (float) Math.random(),(float) Math.random(),(float) Math.random(), 0.5f );
         }
+
+        drawableObjects.addAll(interpreter.load(
+                getResources().openRawResource(R.raw.simple_container),  // OBJ-Datei
+                teapotshaders, // Shader
+                0, CONTAINER_RELATIVE_OFFSET, /*-19.0f*/ -CONTAINER_RELATIVE_OFFSET, CONTAINER_POSITION_DISTANCE,   // Initiale Position
+                "Container1") //Tag
+        );
+        addAppendixByTag("Container1", new Animator() {
+            public void AnimationStep(float[] _model) {
+                Matrix.rotateM(_model,
+                        0,
+                        TIME_DELTA,
+                        0.0f,
+                        0.1f,
+                        0.0f);
+            }
+        });
+
+        drawableObjects.addAll(interpreter.load(
+                getResources().openRawResource(R.raw.simple_container),  // OBJ-Datei
+                teapotshaders, // Shader
+                0, 0, /*-19.0f*/ -CONTAINER_RELATIVE_OFFSET, CONTAINER_POSITION_DISTANCE,   // Initiale Position
+                "Container2") //Tag
+        );
+        addAppendixByTag("Container2", new Animator() {
+            public void AnimationStep(float[] _model) {
+                Matrix.rotateM(_model,
+                        0,
+                        TIME_DELTA,
+                        0.0f,
+                        0.1f,
+                        0.0f);
+            }
+        });
+        addAppendixByTag("Container2", new Interactor() {
+            public void onLookedAt() {
+                parent[0].setColor(0.0f, 0.2f, 1.0f, 1.0f);
+            }
+        });
+
+        drawableObjects.addAll(interpreter.load(
+                getResources().openRawResource(R.raw.simple_container),  // OBJ-Datei
+                teapotshaders, // Shader
+                0, -CONTAINER_RELATIVE_OFFSET, /*-19.0f*/ -CONTAINER_RELATIVE_OFFSET, CONTAINER_POSITION_DISTANCE,   // Initiale Position
+                "Container3") //Tag
+        );
+        addAppendixByTag("Container3", new Animator() {
+            public void AnimationStep(float[] _model) {
+                Matrix.rotateM(_model,
+                        0,
+                        TIME_DELTA,
+                        0.0f,
+                        0.1f,
+                        0.0f);
+            }
+        });
 
 //        drawableObjects.addAll(interpreter.load(
 //                getResources().openRawResource(R.raw.plane),  // OBJ-Datei
@@ -312,10 +373,10 @@ public class MainActivity extends CardboardActivity implements CardboardView.Ste
                 getResources().openRawResource(R.raw.crate_texture),
                 getResources().openRawResource(R.raw.plane),
                 textureshaders, // Shader
-                0, 0, /*-19.0f*/ -1.0f, objectDistance - 3.0f,   // Initiale Position
+                0, 0, /*-19.0f*/ -1.0f, - 2 * objectDistance - 3.0f,   // Initiale Position
                 "SBS Image") //Tag
         );
-        addAnimatorByTag("SBS Image", new Animator() {
+        addAppendixByTag("SBS Image", new Animator() {
             public void AnimationStep(float[] _model) {
                 Matrix.rotateM(_model,
                         0,
@@ -450,10 +511,23 @@ public class MainActivity extends CardboardActivity implements CardboardView.Ste
             Log.e(TAG, "Drawable Object not found");
         }
 */
+        for (int i=0; i < 5; i++) {
+            drawableObjects.get( getGlObjectIndexByName( "Cylinder.00" + Integer.toString(i) ) ).setColor(
+                    (float) Math.random(),
+                    (float) Math.random(),
+                    (float) Math.random(),
+                    (float) Math.random()
+            );
+        }
         // Do an animation step for every object
+        glDrawable next;
         Iterator<glDrawable> it = drawableObjects.iterator();
         while (it.hasNext()) {
-            it.next().prepareAnimation();
+            next = it.next();
+            next.prepareAnimation();
+            if ( next.isLookedAt(headView) ) {
+                next.onLookedAt();
+            }
         }
         // Build the camera matrix and apply it to the ModelView.
         Matrix.setLookAtM(camera, 0, CAMERA_X, CAMERA_Y, CAMERA_Z, CAMERA_CENTER_X, CAMERA_CENTER_Y, CAMERA_CENTER_Z, 0.0f, 1.0f, 0.0f);
@@ -652,6 +726,7 @@ public class MainActivity extends CardboardActivity implements CardboardView.Ste
         return Math.abs(pitch) < PITCH_LIMIT && Math.abs(yaw) < YAW_LIMIT;
     }
 
+
     private void moveCameraInViewDirection(float _distance) {
 //        float yaw = (float) Math.atan2( headView[4], headView[1] );
 //        float pitch = (float) Math.atan2( -headView[8], Math.sqrt(Math.pow(headView[9], 2) + Math.pow( headView[10], 2) ) );
@@ -783,7 +858,7 @@ public class MainActivity extends CardboardActivity implements CardboardView.Ste
      * Assigns an animator to all glDrawables that share the same tag (aka the same parent).
      * @param _tag
      */
-    private void addAnimatorByTag(String _tag, Animator _animator) {
+    private void addAppendixByTag(String _tag, Animator _animator) {
         glDrawable candidate;
         Iterator<glDrawable> it = drawableObjects.iterator();
         while (it.hasNext()) {
@@ -792,6 +867,28 @@ public class MainActivity extends CardboardActivity implements CardboardView.Ste
                 candidate.setAnimation(_animator);
             }
         }
+    }
+
+    /**
+     * Assigns an interactor to all glDrawables that share the same tag (aka the same parent).
+     * @param _tag
+     */
+    private void addAppendixByTag(String _tag, Interactor _interactor) {
+        glDrawable candidate;
+        Iterator<glDrawable> it = drawableObjects.iterator();
+        while (it.hasNext()) {
+            candidate = it.next();
+            if ( candidate.getTag().matches(_tag) ) {
+                _interactor.setParent( getReference(candidate) );
+                candidate.setInteraction(_interactor);
+            }
+        }
+    }
+
+    private glDrawable[] getReference(glDrawable _drawable) {
+        glDrawable[] reference = new glDrawable[1];
+        reference[0] = _drawable;
+        return reference;
     }
 
 }

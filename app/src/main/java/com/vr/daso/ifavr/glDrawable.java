@@ -60,11 +60,13 @@ public class glDrawable {
     protected boolean hasTexture = false;
 
     protected float[] pose;
+    boolean[] lookHistory = new boolean [2];
 
     protected final int TEXTURE_COORDINATE_DATA_SIZE = 2;
     protected int textureDataHandle; // TODO: refactor
 
     protected Animator animator;
+    protected Interactor interactor;
 
     glDrawable(Model _model, int[] _shader, int _mOffset, float _initial_x, float _initial_y, float _intital_z, String _tag) {
 //        switch (_model.getMode() ) {
@@ -101,6 +103,9 @@ public class glDrawable {
         translate(model, _mOffset, _initial_x, _initial_y, _intital_z);
         Matrix.setIdentityM(BASE_MODEL, 0);
         translate(BASE_MODEL, _mOffset, _initial_x, _initial_y, _intital_z);
+
+        lookHistory[0] = false;
+        lookHistory[1] = false;
     }
 
     protected void prepareFloatBuffer() {
@@ -350,6 +355,48 @@ public class glDrawable {
         }
         // rearrange the data
         prepareFloatBuffer();
+    }
+
+    public void setInteraction(Interactor _interactor) {
+        interactor = _interactor;
+    }
+
+    public void onLookedAt() {
+        interactor.onLookedAt();
+    }
+
+    public void onClicked() {
+        interactor.onClicked();
+    }
+
+    public void onLookDiscontinued() {
+        interactor.onLookDiscontinued();
+    }
+
+
+
+    boolean isLookedAt(float[] _headView) {
+        final float PITCH_LIMIT = 0.12f;
+        final float YAW_LIMIT = 0.12f;
+
+        float[] initVec = { 0, 0, 0, 1.0f };
+        float[] objPositionVec = new float[4];
+
+        // Convert object space to camera space. Use the headView from onNewFrame.
+        Matrix.multiplyMM(modelView, 0, _headView, 0, model, 0);
+        Matrix.multiplyMV(objPositionVec, 0, modelView, 0, initVec, 0);
+
+        float pitch = (float) Math.atan2(objPositionVec[1], -objPositionVec[2]);
+        float yaw = (float) Math.atan2(objPositionVec[0], -objPositionVec[2]);
+
+        lookHistory[0] = lookHistory[1];
+        lookHistory[1] = Math.abs(pitch) < PITCH_LIMIT && Math.abs(yaw) < YAW_LIMIT;
+
+        return Math.abs(pitch) < PITCH_LIMIT && Math.abs(yaw) < YAW_LIMIT;
+    }
+
+    boolean previouslyLookedAt() {
+        return (lookHistory[0] == true) && (lookHistory[1] == false);
     }
 
     //    abstract public void onLookedAt();
