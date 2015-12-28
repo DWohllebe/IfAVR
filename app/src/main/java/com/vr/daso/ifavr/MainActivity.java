@@ -137,6 +137,8 @@ public class MainActivity extends CardboardActivity implements CardboardView.Ste
     private Pumpstation pumpStation;
     private Category pumpInformation;
 
+    private int timestep = 0;
+
     private float CONTAINER_RELATIVE_OFFSET = 3.0f;
     private float CONTAINER_POSITION_DISTANCE = 6.0f;
 
@@ -276,7 +278,7 @@ public class MainActivity extends CardboardActivity implements CardboardView.Ste
         drawableObjects.addAll(interpreter.load(
                 getResources().openRawResource(R.raw.josie_rizal),  // OBJ-Datei
                 teapotshaders, // Shader
-                0, 0, /*-19.0f*/ -1.0f, -2*objectDistance,   // Initiale Position
+                0, 0, /*-19.0f*/ -1.0f, -0.5f*objectDistance,   // Initiale Position
                 "Test Object") //Tag
         );
         addAppendixByTag("Test Object", new Animator() {
@@ -300,6 +302,7 @@ public class MainActivity extends CardboardActivity implements CardboardView.Ste
                 parent[0].setColor(0.0f, 0.2f, 1.0f, 1.0f);
                 Log.d(TAG, "YO! Default Object is being looked at!");
             }
+
             @Override
             public void onLookDiscontinued() {
                 parent[0].enableOnLookedAtAction(true);
@@ -312,6 +315,47 @@ public class MainActivity extends CardboardActivity implements CardboardView.Ste
                 parent[0].enableOnLookedAtAction(false);
                 parent[0].setColor(1.0f, 0.2f, 0.0f, 1.0f);
                 Log.d(TAG, "DAMN! Default Object is being clicked!");
+            }
+        });
+
+        //Pump-Over Text
+        drawableObjects.addAll(interpreter.load(
+                getResources().openRawResource(R.raw.pump_over_text),  // OBJ-Datei
+                teapotshaders, // Shader
+                0, 1.5f*CONTAINER_RELATIVE_OFFSET, /*-19.0f*/ -CONTAINER_RELATIVE_OFFSET, CONTAINER_POSITION_DISTANCE*0.4f,   // Initiale Position
+                "Pump_Over_Text") //Tag
+        );
+        //Change the Rotation of the Model
+        Matrix.rotateM(
+                drawableObjects.get(getGlObjectIndexByTag("Pump_Over_Text")).getModel(),
+                0,
+                10,
+                1.0f,
+                0.0f,
+                0.0f);
+        Matrix.rotateM(
+                drawableObjects.get(getGlObjectIndexByTag("Pump_Over_Text")).getModel(),
+                0,
+                180+70,
+                0.0f,
+                1.0f,
+                0.0f);
+        addSingleAppendixByIdentity("Text_Pump_Over", "Pump_Over_Text", new Interactor() {
+            @Override
+            public void onLookedAt() {
+                parent[0].setColor(0.0f, 0.2f, 1.0f, 1.0f);
+            }
+
+            @Override
+            public void onLookDiscontinued() {
+                parent[0].enableOnLookedAtAction(true);
+                parent[0].setColor(0.2f, 1.0f, 0.0f, 1.0f);
+            }
+
+            @Override
+            public void onClicked() {
+                parent[0].enableOnLookedAtAction(false);
+                parent[0].setColor(1.0f, 0.2f, 0.0f, 1.0f);
             }
         });
 
@@ -539,6 +583,7 @@ public class MainActivity extends CardboardActivity implements CardboardView.Ste
      */
     @Override
     public void onNewFrame(HeadTransform headTransform) {
+        timestep++;
         // Build the Model part of the ModelView matrix.
 //        Matrix.rotateM(modelCube, 0, TIME_DELTA, 0.5f, 0.5f, 1.0f);
 /*        try {
@@ -583,6 +628,8 @@ public class MainActivity extends CardboardActivity implements CardboardView.Ste
                 next.onLookDiscontinued();
             }
         }
+
+        pumpStationMethod();
 
         checkGLError("onReadyToDraw");
     }
@@ -686,27 +733,7 @@ public class MainActivity extends CardboardActivity implements CardboardView.Ste
 
         checkGLError("drawing floor");
     }
-/*
-    public void drawGlObject(glDrawable _obj) {
-        GLES20.glUseProgram(_obj.program);
 
-        // Set ModelView, MVP, position, normals, and color.
-        GLES20.glUniform3fv(_obj.lightPosParam, 1, _obj.lightPosInEyeSpace, 0);
-        GLES20.glUniformMatrix4fv(_obj.modelParam, 1, false, _obj.model, 0);
-        GLES20.glUniformMatrix4fv(_obj.modelViewParam, 1, false, modelView, 0);
-        GLES20.glUniformMatrix4fv(_obj.modelViewProjectionParam, 1, false,
-                modelViewProjection, 0);
-        GLES20.glVertexAttribPointer(_obj.positionParam, COORDS_PER_VERTEX, GLES20.GL_FLOAT,
-                false, 0, floorVertices);
-        GLES20.glVertexAttribPointer(_obj.normalParam, 3, GLES20.GL_FLOAT, false, 0,
-                floorNormals);
-        GLES20.glVertexAttribPointer(_obj.colorParam, 4, GLES20.GL_FLOAT, false, 0, floorColors);
-
-        GLES20.glDrawArrays(GLES20.GL_TRIANGLES, 0, 6);
-
-        checkGLError("drawing object " + _obj.name);
-    }
-*/
     /**
      * Called when the Cardboard trigger is pulled.
      */
@@ -988,6 +1015,10 @@ public class MainActivity extends CardboardActivity implements CardboardView.Ste
         _reference[ref_index] = _drawable;
         ref_index++;
         return ref_index-1;
+    }
+
+    public void pumpStationMethod() {
+
     }
 
 }
