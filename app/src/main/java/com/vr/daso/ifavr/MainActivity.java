@@ -66,7 +66,7 @@ public class MainActivity extends CardboardActivity implements CardboardView.Ste
     private static final float Z_NEAR = 0.1f;
     private static final float Z_FAR = 100.0f;
 
-    private static float CAMERA_Z = /*0.01f*/ -5.40f;
+    private static float CAMERA_Z = 0.01f /*-5.40f*/;
     private static float CAMERA_Y = /*-18.0f*/0.0f;
     private static float CAMERA_X = 0.0f;
     private static final float TIME_DELTA = 1.0f;
@@ -137,8 +137,8 @@ public class MainActivity extends CardboardActivity implements CardboardView.Ste
     private Pumpstation pumpStation;
     private Category pumpInformation;
 
-    private float CONTAINER_RELATIVE_OFFSET = 2.5f;
-    private float CONTAINER_POSITION_DISTANCE = 4.0f;
+    private float CONTAINER_RELATIVE_OFFSET = 3.0f;
+    private float CONTAINER_POSITION_DISTANCE = 6.0f;
 
     /**
      * Converts a raw text file, saved as a resource, into an OpenGL ES shader.
@@ -294,6 +294,26 @@ public class MainActivity extends CardboardActivity implements CardboardView.Ste
         while (it.hasNext()) {
             it.next().setColor( (float) Math.random(),(float) Math.random(),(float) Math.random(), 0.5f );
         }
+        addSingleAppendixByIdentity("Test Object", "Josie", new Interactor() {
+            @Override
+            public void onLookedAt() {
+                parent[0].setColor(0.0f, 0.2f, 1.0f, 1.0f);
+                Log.d(TAG, "YO! Default Object is being looked at!");
+            }
+            @Override
+            public void onLookDiscontinued() {
+                parent[0].enableOnLookedAtAction(true);
+                parent[0].setColor(0.2f, 1.0f, 0.0f, 1.0f);
+                Log.d(TAG, "WHAT?! Default Object is not being looked at anymore!");
+            }
+
+            @Override
+            public void onClicked() {
+                parent[0].enableOnLookedAtAction(false);
+                parent[0].setColor(1.0f, 0.2f, 0.0f, 1.0f);
+                Log.d(TAG, "DAMN! Default Object is being clicked!");
+            }
+        });
 
         drawableObjects.addAll(interpreter.load(
                 getResources().openRawResource(R.raw.simple_container),  // OBJ-Datei
@@ -311,6 +331,16 @@ public class MainActivity extends CardboardActivity implements CardboardView.Ste
                         0.0f);
             }
         });
+//        addAppendixByTag("Container1", new Interactor() {
+//            @Override
+//            public void onLookedAt() {
+//                parent[refIndex].setColor(0.0f, 0.2f, 1.0f, 1.0f);
+//            }
+//            @Override
+//            public void onLookDiscontinued() {
+//                parent[refIndex].setColor(0.2f, 1.0f, 0.0f, 1.0f);
+//            }
+//        });
 
         drawableObjects.addAll(interpreter.load(
                 getResources().openRawResource(R.raw.simple_container),  // OBJ-Datei
@@ -328,11 +358,16 @@ public class MainActivity extends CardboardActivity implements CardboardView.Ste
                         0.0f);
             }
         });
-        addAppendixByTag("Container2", new Interactor() {
-            public void onLookedAt() {
-                parent[0].setColor(0.0f, 0.2f, 1.0f, 1.0f);
-            }
-        });
+//        addAppendixByTag("Container2", new Interactor() {
+//            @Override
+//            public void onLookedAt() {
+//                parent[refIndex].setColor(0.0f, 0.2f, 1.0f, 1.0f);
+//            }
+//            @Override
+//            public void onLookDiscontinued() {
+//                parent[refIndex].setColor(0.2f, 1.0f, 0.0f, 1.0f);
+//            }
+//        });
 
         drawableObjects.addAll(interpreter.load(
                 getResources().openRawResource(R.raw.simple_container),  // OBJ-Datei
@@ -350,6 +385,16 @@ public class MainActivity extends CardboardActivity implements CardboardView.Ste
                         0.0f);
             }
         });
+//        addAppendixByTag("Container3", new Interactor() {
+//            @Override
+//            public void onLookedAt() {
+//                parent[0].setColor(0.0f, 0.2f, 1.0f, 1.0f);
+//            }
+//            @Override
+//            public void onLookDiscontinued() {
+//                parent[0].setColor(0.2f, 1.0f, 0.0f, 1.0f);
+//            }
+//        });
 
 //        drawableObjects.addAll(interpreter.load(
 //                getResources().openRawResource(R.raw.plane),  // OBJ-Datei
@@ -369,24 +414,24 @@ public class MainActivity extends CardboardActivity implements CardboardView.Ste
 //        });
 //        drawableObjects.get(getGlObjectIndexByTag("Plane")).loadTexture(this, R.raw.crate_texture);
 
-        drawableObjects.add(interpreter.loadSBSImage(
-                getResources().openRawResource(R.raw.crate_texture),
-                getResources().openRawResource(R.raw.plane),
-                textureshaders, // Shader
-                0, 0, /*-19.0f*/ -1.0f, - 2 * objectDistance - 3.0f,   // Initiale Position
-                "SBS Image") //Tag
-        );
-        addAppendixByTag("SBS Image", new Animator() {
-            public void AnimationStep(float[] _model) {
-                Matrix.rotateM(_model,
-                        0,
-                        TIME_DELTA,
-                        0.1f,
-                        0.1f,
-                        0.1f);
-                Matrix.translateM(_model, 0, 0.0001f, 0.0001f, 0.0001f);
-            }
-        });
+//        drawableObjects.add(interpreter.loadSBSImage(
+//                getResources().openRawResource(R.raw.crate_texture),
+//                getResources().openRawResource(R.raw.plane),
+//                textureshaders, // Shader
+//                0, 0, /*-19.0f*/ -1.0f, - 2 * objectDistance - 3.0f,   // Initiale Position
+//                "SBS Image") //Tag
+//        );
+//        addAppendixByTag("SBS Image", new Animator() {
+//            public void AnimationStep(float[] _model) {
+//                Matrix.rotateM(_model,
+//                        0,
+//                        TIME_DELTA,
+//                        0.1f,
+//                        0.1f,
+//                        0.1f);
+//                Matrix.translateM(_model, 0, 0.0001f, 0.0001f, 0.0001f);
+//            }
+//        });
 
 
 
@@ -511,6 +556,11 @@ public class MainActivity extends CardboardActivity implements CardboardView.Ste
             Log.e(TAG, "Drawable Object not found");
         }
 */
+        // Build the camera matrix and apply it to the ModelView.
+        Matrix.setLookAtM(camera, 0, CAMERA_X, CAMERA_Y, CAMERA_Z, CAMERA_CENTER_X, CAMERA_CENTER_Y, CAMERA_CENTER_Z, 0.0f, 1.0f, 0.0f);
+
+        headTransform.getHeadView(headView, 0);
+/*
         for (int i=0; i < 5; i++) {
             drawableObjects.get( getGlObjectIndexByName( "Cylinder.00" + Integer.toString(i) ) ).setColor(
                     (float) Math.random(),
@@ -519,20 +569,20 @@ public class MainActivity extends CardboardActivity implements CardboardView.Ste
                     (float) Math.random()
             );
         }
+*/
         // Do an animation step for every object
         glDrawable next;
         Iterator<glDrawable> it = drawableObjects.iterator();
         while (it.hasNext()) {
             next = it.next();
             next.prepareAnimation();
-            if ( next.isLookedAt(headView) ) {
+            if ( next.isLookedAt(headView, camera) ) {
                 next.onLookedAt();
             }
+            else if ( next.previouslyLookedAt() ) {
+                next.onLookDiscontinued();
+            }
         }
-        // Build the camera matrix and apply it to the ModelView.
-        Matrix.setLookAtM(camera, 0, CAMERA_X, CAMERA_Y, CAMERA_Z, CAMERA_CENTER_X, CAMERA_CENTER_Y, CAMERA_CENTER_Z, 0.0f, 1.0f, 0.0f);
-
-        headTransform.getHeadView(headView, 0);
 
         checkGLError("onReadyToDraw");
     }
@@ -663,6 +713,16 @@ public class MainActivity extends CardboardActivity implements CardboardView.Ste
     @Override
     public void onCardboardTrigger() {
         Log.i(TAG, "onCardboardTrigger");
+        // Has an object been looked at?
+        glDrawable next;
+        Iterator<glDrawable> it = drawableObjects.iterator();
+        while (it.hasNext()) {
+            next = it.next();
+            if ( next.isLookedAt(headView, camera) ) {
+                overlayView.show3DToast("*click*");
+                next.onClicked();
+            }
+        }
 
 //        if (isLookingAtObject()) {
 //            score++;
@@ -672,7 +732,7 @@ public class MainActivity extends CardboardActivity implements CardboardView.Ste
 //            overlayView.show3DToast("Look around to find the object!");
 //        }
 
-        moveCameraInViewDirection(0.5f);
+//        moveCameraInViewDirection(0.5f);
 
         // Always give user feedback.
         vibrator.vibrate(50);
@@ -854,6 +914,21 @@ public class MainActivity extends CardboardActivity implements CardboardView.Ste
         return (-1);
     }
 
+    private int getGlObjectIndexByTagAndName(String _parent, String _name) {
+        glDrawable next;
+        int loop = 0;
+
+        Iterator<glDrawable> it = drawableObjects.iterator();
+        while (it.hasNext()) {
+            next = it.next();
+            if ( next.getTag().matches(_parent) && next.getName().matches(_name) ) {
+                return loop;
+            }
+            loop++;
+        }
+        return (-1);
+    }
+
     /**
      * Assigns an animator to all glDrawables that share the same tag (aka the same parent).
      * @param _tag
@@ -875,20 +950,45 @@ public class MainActivity extends CardboardActivity implements CardboardView.Ste
      */
     private void addAppendixByTag(String _tag, Interactor _interactor) {
         glDrawable candidate;
+        Interactor interactor;
+
         Iterator<glDrawable> it = drawableObjects.iterator();
         while (it.hasNext()) {
             candidate = it.next();
+            interactor = new Interactor(_interactor);
             if ( candidate.getTag().matches(_tag) ) {
-                _interactor.setParent( getReference(candidate) );
-                candidate.setInteraction(_interactor);
+                glDrawable[] ref = new glDrawable[1];
+                getReference(ref, candidate);
+                interactor.setParent(ref);
+                candidate.setInteraction(interactor);
             }
         }
     }
 
-    private glDrawable[] getReference(glDrawable _drawable) {
-        glDrawable[] reference = new glDrawable[1];
-        reference[0] = _drawable;
-        return reference;
+    private void addSingleAppendixByIdentity(String _tag, String _name, Interactor _interactor) {
+        glDrawable candidate;
+
+        Iterator<glDrawable> it = drawableObjects.iterator();
+        while (it.hasNext()) {
+            candidate = it.next();
+            if ( candidate.getName().matches(_name) && candidate.getTag().matches(_tag) ) {
+                glDrawable[] ref = new glDrawable[1];
+                getReference(ref, candidate);
+                _interactor.setParent(ref);
+                candidate.setInteraction(_interactor);
+                return;
+            }
+        }
+    }
+
+    static int getReference(glDrawable[] _reference, glDrawable _drawable) {
+        int ref_index = 0;
+//        glDrawable[] reference = new glDrawable[1];
+//        reference[0] = _drawable;
+        _reference[ref_index] = _drawable;
+        ref_index++;
+        return ref_index-1;
     }
 
 }
+

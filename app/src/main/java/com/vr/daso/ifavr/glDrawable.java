@@ -68,6 +68,10 @@ public class glDrawable {
     protected Animator animator;
     protected Interactor interactor;
 
+    protected boolean lookAtActionEnabled = true;
+    protected boolean previouslyLookedAtActionEnabled = true;
+    protected boolean clickedOnActionEnabled = true;
+
     glDrawable(Model _model, int[] _shader, int _mOffset, float _initial_x, float _initial_y, float _intital_z, String _tag) {
 //        switch (_model.getMode() ) {
 //            case MESH:
@@ -135,7 +139,7 @@ public class glDrawable {
             fbTexels.position(0);
         }
         else {
-           Log.i(TAG, "Texels are null");
+//           Log.i(TAG, "Texels are null");
         }
 
 
@@ -303,9 +307,7 @@ public class glDrawable {
             hasTexture = true;
             return;
         }
-
         throw new RuntimeException("Error loading texture.");
-
      }
 
     String getName() {
@@ -362,29 +364,46 @@ public class glDrawable {
     }
 
     public void onLookedAt() {
-        interactor.onLookedAt();
+        if (interactor != null) {
+            if (lookAtActionEnabled) {
+                interactor.onLookedAt();
+                Log.d(TAG + " " + name, "Looking at object");
+            }
+        }
+        else {
+            Log.d(TAG + " " + name, "Looking at object, but no interaction specified");
+        }
     }
 
     public void onClicked() {
-        interactor.onClicked();
+        if (interactor != null) {
+            interactor.onClicked();
+        }
     }
 
     public void onLookDiscontinued() {
-        interactor.onLookDiscontinued();
+        if (interactor != null) {
+            interactor.onLookDiscontinued();
+        }
     }
 
-
-
-    boolean isLookedAt(float[] _headView) {
+    boolean isLookedAt(float[] _headView, float[] _camera) {
         final float PITCH_LIMIT = 0.12f;
         final float YAW_LIMIT = 0.12f;
 
         float[] initVec = { 0, 0, 0, 1.0f };
         float[] objPositionVec = new float[4];
+        float[] mModelView = new float[16];
+
+        float[] camHeadView = new float[16];
+        Matrix.multiplyMM(camHeadView, 0, _headView, 0, _camera, 0);
+//        Matrix.invertM(invHeadView, 0, _headView, 0);
+        //Matrix.rotateM(rotHeadView, 0, 90, 1, 1, 1);
+//        Matrix.transposeM(rotHeadView, 0, _headView, 0);
 
         // Convert object space to camera space. Use the headView from onNewFrame.
-        Matrix.multiplyMM(modelView, 0, _headView, 0, model, 0);
-        Matrix.multiplyMV(objPositionVec, 0, modelView, 0, initVec, 0);
+        Matrix.multiplyMM(mModelView, 0, camHeadView, 0, model, 0);
+        Matrix.multiplyMV(objPositionVec, 0, mModelView, 0, initVec, 0);
 
         float pitch = (float) Math.atan2(objPositionVec[1], -objPositionVec[2]);
         float yaw = (float) Math.atan2(objPositionVec[0], -objPositionVec[2]);
@@ -397,6 +416,18 @@ public class glDrawable {
 
     boolean previouslyLookedAt() {
         return (lookHistory[0] == true) && (lookHistory[1] == false);
+    }
+
+    public void enableOnLookedAtAction(boolean _b) {
+        lookAtActionEnabled = _b;
+    }
+
+    public void enableOnPreviouslyLookedAtAction(boolean _b) {
+        previouslyLookedAtActionEnabled = _b;
+    }
+
+    public void enableOnClickedAction(boolean _b) {
+        clickedOnActionEnabled = _b;
     }
 
     //    abstract public void onLookedAt();
