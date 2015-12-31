@@ -4,6 +4,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.BitmapShader;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
 import android.view.View;
 
@@ -134,13 +135,25 @@ public class MainActivity extends CardboardActivity implements CardboardView.Ste
     private Vibrator vibrator;
     private CardboardOverlayView overlayView;
 
-    private Pumpstation pumpStation;
-    private Category pumpInformation;
-
     private int timestep = 0;
 
-    private float CONTAINER_RELATIVE_OFFSET = 3.0f;
-    private float CONTAINER_POSITION_DISTANCE = 6.0f;
+    ////////////// /*** Pump Station ***/ ////////////////////
+    private Pumpstation pumpStation = new Pumpstation();    //
+    private Category pumpInformation;                       //
+                                                            //
+    private float CONTAINER_RELATIVE_OFFSET = 3.0f;         //
+    private float CONTAINER_POSITION_DISTANCE = 6.0f;       //
+                                                            //
+    // color constants                                      //
+    final float RGB_MAX = 255;                              //
+    final float WATER_R = 64 / RGB_MAX;                     //
+    final float WATER_G = 182 / RGB_MAX;                    //
+    final float WATER_B = 255 / RGB_MAX;                    //
+    final float WATER_T = 0.6f;                             //
+    final float EMPTY_R = 255 / RGB_MAX;                    //
+    final float EMPTY_G = 255 / RGB_MAX;                    //
+    final float EMPTY_B = 255 / RGB_MAX;                    //
+    final float EMPTY_T = 0.6f;                             //
 
     /**
      * Converts a raw text file, saved as a resource, into an OpenGL ES shader.
@@ -209,10 +222,10 @@ public class MainActivity extends CardboardActivity implements CardboardView.Ste
         headView = new float[16];
         vibrator = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
 
-//        WebServiceTask webTask = (WebServiceTask)new WebServiceTask().execute(
- //              /* "http://tu-dresden.de/ifa/"*/"http://www.webserviceX.NET/",
- //               /*"http://opcfoundation.org/webservices/XMLDA/1.0/Read"*/"GetCountries",
- //               /*"http://141.30.154.211:8087/OPC/DA"*/"http://www.webservicex.net/country.asmx" );
+        WebServiceTask webTask = (WebServiceTask)new WebServiceTask().execute(
+               /* "http://tu-dresden.de/ifa/"*/"http://www.webserviceX.NET/",
+                /*"http://opcfoundation.org/webservices/XMLDA/1.0/Read"*/"GetCountries",
+                /*"http://141.30.154.211:8087/OPC/DA"*/"http://www.webservicex.net/country.asmx" );
 
         overlayView = (CardboardOverlayView) findViewById(R.id.overlay);
         overlayView.show3DToast("Loading, please wait...");
@@ -344,6 +357,7 @@ public class MainActivity extends CardboardActivity implements CardboardView.Ste
             @Override
             public void onLookedAt() {
                 parent[0].setColor(0.0f, 0.2f, 1.0f, 1.0f);
+                Log.d(TAG, "What'cha looking at, fella?");
             }
 
             @Override
@@ -375,6 +389,11 @@ public class MainActivity extends CardboardActivity implements CardboardView.Ste
                         0.0f);
             }
         });
+        for (int i = 0; i < 2; i++) {
+            String concat = "Sphere.00" + Integer.toString(i);
+            drawableObjects.get(getGlObjectIndexByTagAndName("Container1", concat))
+                    .setColor(0.8f, 0.25f, 0.6f, 0.8f);
+        }
 //        addAppendixByTag("Container1", new Interactor() {
 //            @Override
 //            public void onLookedAt() {
@@ -402,6 +421,11 @@ public class MainActivity extends CardboardActivity implements CardboardView.Ste
                         0.0f);
             }
         });
+        for (int i = 0; i < 2; i++) {
+            String concat = "Sphere.00" + Integer.toString(i);
+            drawableObjects.get(getGlObjectIndexByTagAndName("Container2", concat))
+                    .setColor(0.8f, 0.25f, 0.6f, 0.8f);
+        }
 //        addAppendixByTag("Container2", new Interactor() {
 //            @Override
 //            public void onLookedAt() {
@@ -429,6 +453,11 @@ public class MainActivity extends CardboardActivity implements CardboardView.Ste
                         0.0f);
             }
         });
+        for (int i = 0; i < 2; i++) {
+            String concat = "Sphere.00" + Integer.toString(i);
+            drawableObjects.get(getGlObjectIndexByTagAndName("Container3", concat))
+                    .setColor(0.8f, 0.25f, 0.6f, 0.8f);
+        }
 //        addAppendixByTag("Container3", new Interactor() {
 //            @Override
 //            public void onLookedAt() {
@@ -478,41 +507,14 @@ public class MainActivity extends CardboardActivity implements CardboardView.Ste
 //        });
 
 
-
 //        drawableObjects.add( interpreter.load(
 //                getResources().openRawResource(R.raw.cube),  // OBJ-Datei
 //                teapotshaders, // Shader
 //                0, 0, -19, objectDistance) // Initiale Position
 //        );
 
-//        cubeProgram = GLES20.glCreateProgram();
-//        GLES20.glAttachShader(cubeProgram, vertexShader);
-//        GLES20.glAttachShader(cubeProgram, passthroughShader);
-//        GLES20.glLinkProgram(cubeProgram);
-//        GLES20.glUseProgram(cubeProgram);
+        checkGLError("Constructing drawable objects");
 
-        checkGLError("Teapot program");
-
-//        cubePositionParam = GLES20.glGetAttribLocation(cubeProgram, "a_Position");
-//        cubeNormalParam = GLES20.glGetAttribLocation(cubeProgram, "a_Normal");
-//        cubeColorParam = GLES20.glGetAttribLocation(cubeProgram, "a_Color");
-
-//        cubeModelParam = GLES20.glGetUniformLocation(cubeProgram, "u_Model");
-//        cubeModelViewParam = GLES20.glGetUniformLocation(cubeProgram, "u_MVMatrix");
-//        cubeModelViewProjectionParam = GLES20.glGetUniformLocation(cubeProgram, "u_MVP");
-//        cubeLightPosParam = GLES20.glGetUniformLocation(cubeProgram, "u_LightPos");
-
-//        GLES20.glEnableVertexAttribArray(cubePositionParam);
-//        GLES20.glEnableVertexAttribArray(cubeNormalParam);
-//        GLES20.glEnableVertexAttribArray(cubeColorParam);
-
-//        checkGLError("Cube program params");
-
-//        floorProgram = GLES20.glCreateProgram();
-//        GLES20.glAttachShader(floorProgram, vertexShader);
-//        GLES20.glAttachShader(floorProgram, gridShader);
-//        GLES20.glLinkProgram(floorProgram);
-//        GLES20.glUseProgram(floorProgram);
         int[] floorshaders = {vertexShader, gridShader};
         floorProgram = createProgram(floorshaders);
 
@@ -532,10 +534,6 @@ public class MainActivity extends CardboardActivity implements CardboardView.Ste
         GLES20.glEnableVertexAttribArray(floorColorParam);
 
         checkGLError("Floor program params");
-
-        // Object first appears directly in front of user.
-//        Matrix.setIdentityM(modelCube, 0);
-//        Matrix.translateM(modelCube, 0, 0, 0, -objectDistance);
 
         Matrix.setIdentityM(modelFloor, 0);
         Matrix.translateM(modelFloor, 0, 0, -floorDepth, 0); // Floor appears below user.
@@ -584,6 +582,12 @@ public class MainActivity extends CardboardActivity implements CardboardView.Ste
     @Override
     public void onNewFrame(HeadTransform headTransform) {
         timestep++;
+        makeShitUp();
+        TankUpdateTask my_task = new TankUpdateTask();
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB)
+            my_task.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, pumpStation, drawableObjects);
+        else
+            my_task.execute(pumpStation, drawableObjects);
         // Build the Model part of the ModelView matrix.
 //        Matrix.rotateM(modelCube, 0, TIME_DELTA, 0.5f, 0.5f, 1.0f);
 /*        try {
@@ -628,8 +632,6 @@ public class MainActivity extends CardboardActivity implements CardboardView.Ste
                 next.onLookDiscontinued();
             }
         }
-
-        pumpStationMethod();
 
         checkGLError("onReadyToDraw");
     }
@@ -1017,8 +1019,132 @@ public class MainActivity extends CardboardActivity implements CardboardView.Ste
         return ref_index-1;
     }
 
-    public void pumpStationMethod() {
 
+    // TODO: Currently the TankUpdateTask works for only one station
+    private class TankUpdateTask extends AsyncTask<Object, Integer, Integer> {
+        protected Integer doInBackground(Object... params) { // param0: pumpStation, param1: drawables
+            // section constants
+            final int SECTIONS = 5;
+            final float MAX_VAL = 100.0f;
+            final float DELTA_SECTION = MAX_VAL / (float)SECTIONS;
+
+            String concat = "";
+
+            float fuellstand_1 = ((Pumpstation)params[0]).Fuellstand1_Ist;
+            float fuellstand_2 = ((Pumpstation)params[0]).Fuellstand2_Ist;
+            float fuellstand_3 = ((Pumpstation)params[0]).Fuellstand3_Ist;
+
+            for (int i = 0; i < SECTIONS; i++) {
+                // passe String an vorhandene Zylinder an
+                concat = prepareConcatString(i);
+
+                //Fuellstand Container 1
+                try {
+                    if ((i+1) * DELTA_SECTION >= fuellstand_1) {  // Section ist befüllt
+                        publishProgress(
+                                getGlObjectIndexInTask((ArrayList<glDrawable>) params[1], "Container1", concat),
+                                1);
+
+
+                    } else {
+                        publishProgress(
+                                getGlObjectIndexInTask((ArrayList<glDrawable>) params[1], "Container1", concat),
+                                0);
+                    }
+                }
+                catch (ArrayIndexOutOfBoundsException e) {
+                    Log.e(TAG, e.toString() + " at Container1 with i=" + Integer.toString(i) + " with concat=" + concat);
+                }
+
+                //Fuellstand Container 2
+                try {
+                    if (i * DELTA_SECTION >= fuellstand_2) {  // Section ist befüllt
+                        publishProgress(
+                                getGlObjectIndexInTask((ArrayList<glDrawable>) params[1], "Container2", concat),
+                                1);
+
+                    } else {
+                        publishProgress(
+                                getGlObjectIndexInTask((ArrayList<glDrawable>) params[1], "Container2", concat),
+                                0);
+                    }
+                }
+                catch (ArrayIndexOutOfBoundsException e) {
+                    Log.e(TAG, e.toString() + " at Container2 with i=" + Integer.toString(i) + " with concat=" + concat);
+                }
+
+                //Fuellstand Container 3
+                try {
+                    if (i * DELTA_SECTION >= fuellstand_3) {  // Section ist befüllt
+                        publishProgress(
+                                getGlObjectIndexInTask((ArrayList<glDrawable>) params[1], "Container3", concat),
+                                1);
+
+                    } else {
+                        publishProgress(
+                                getGlObjectIndexInTask((ArrayList<glDrawable>) params[1], "Container3", concat),
+                                0);
+                    }
+                }
+                catch (ArrayIndexOutOfBoundsException e) {
+                    Log.e(TAG, e.toString() + " at Container3 with i=" + Integer.toString(i) + " with concat=" + concat);
+                }
+
+            }
+            return 0;
+        }
+
+        protected void onProgressUpdate(Integer... progress) {
+            switch (progress[1]) {
+                case 0: // section is empty
+                    drawableObjects.get(progress[0]).setColor(EMPTY_R, EMPTY_G, EMPTY_B, EMPTY_T);
+                    break;
+                case 1: // section is filled
+                    drawableObjects.get(progress[0]).setColor(WATER_R, WATER_G, WATER_B, WATER_T);
+            }
+        }
+
+        protected void onPostExecute(Integer result) {
+            Log.d(TAG, "Pumpstation asessed");
+        }
+
+    String prepareConcatString(int i) throws IndexOutOfBoundsException {
+        String concat = "";
+        if (i < 10) {
+            concat = "Cylinder.00" + Integer.toString(i);
+        } else
+        if (i < 100) {
+            concat = "Cylinder.0" + Integer.toString(i);
+        } else
+        if (i < 1000) {
+            concat = "Cylinder." + Integer.toString(i);
+        } else
+        {
+            throw new IndexOutOfBoundsException();
+        }
+        return concat;
+    }
+
+        private int getGlObjectIndexInTask(ArrayList<glDrawable> _list, String _parent, String _name) {
+            glDrawable next;
+            int loop = 0;
+
+            Iterator<glDrawable> it = _list.iterator();
+            while (it.hasNext()) {
+                next = it.next();
+                if ( next.getTag().matches(_parent) && next.getName().matches(_name) ) {
+                    return loop;
+                }
+                loop++;
+            }
+            return (-1);
+        }
+    }
+
+    void makeShitUp() {
+        pumpStation.Fuellstand1_Ist = (float) Math.random() * 100;
+        pumpStation.Fuellstand2_Ist = 100;
+        pumpStation.Fuellstand3_Ist = 35;
     }
 
 }
